@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React, { useLayoutEffect, useContext, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -40,7 +40,7 @@ const HomeScreen = () => {
       setUserId(userId);
 
       axios
-        .get(`http://localhost:8000/users/${userId}`)
+        .get(`http://192.168.1.14:8000/users/${userId}`)
         .then((response) => {
           setUsers(response.data);
         })
@@ -60,6 +60,14 @@ const HomeScreen = () => {
           <User key={index} item={item} />
         ))}
       </View>
+      <Pressable
+        onPress={() => navigation.navigate("Login")}
+        style={{ marginTop: 15 }}
+      >
+        <Text style={{ textAlign: "center", color: "gray", fontSize: 16 }}>
+          Logout
+        </Text>
+      </Pressable>
     </View>
   );
 };
