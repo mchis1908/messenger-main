@@ -5,11 +5,14 @@ import {
   Text,
   TextInput,
   View,
+  Image,
 } from "react-native";
-import React, { useState ,useEffect} from "react";
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import logo from "../assets/logo.png";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -39,7 +42,7 @@ const LoginScreen = () => {
     };
 
     axios
-      .post("http://192.168.1.14:8000/login", user)
+      .post("http://192.168.2.10:8000/login", user)
       .then((response) => {
         console.log(response);
         const token = response.data.token;
@@ -57,8 +60,8 @@ const LoginScreen = () => {
       style={{
         flex: 1,
         backgroundColor: "white",
-        padding: 10,
         alignItems: "center",
+        padding:10,
       }}
     >
       <KeyboardAvoidingView>
@@ -69,67 +72,88 @@ const LoginScreen = () => {
             alignItems: "center",
           }}
         >
-          <Text style={{ color: "#4A55A2", fontSize: 17, fontWeight: "600" }}>
+          <Image
+            source={logo}
+            style={{ width: 180, height: 100, alignSelf: "center" }}
+          />
+          <Text
+            style={{
+              color: "#4A55A2",
+              fontSize: 17,
+              fontWeight: "600",
+              marginTop: 20,
+            }}
+          >
             Sign In
-          </Text>
-
-          <Text style={{ fontSize: 17, fontWeight: "600", marginTop: 15 }}>
-            Sign In to Your Account
           </Text>
         </View>
 
-        <View style={{ marginTop: 50 }}>
-          <View>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "gray" }}>
-              Email
-            </Text>
-
+        <View style={{ marginTop: 40, width: 350 }}>
+          <View 
+            className="signIn-email-input"
+            style={{
+              borderColor: "gray",
+              borderWidth: 0.5,
+              borderRadius: 10,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+            }}
+          >
+            <Icon style={styles.icon} name="email" size={18} color="gray" />
             <TextInput
               value={email}
               onChangeText={(text) => setEmail(text)}
               style={{
                 fontSize: email ? 18 : 18,
-                borderBottomColor: "gray",
-                borderBottomWidth: 1,
-                marginVertical: 10,
-                width: 300,
+                flex: 1,
+                padding: 10,
               }}
-              placeholderTextColor={"black"}
-              placeholder="enter Your Email"
+              placeholder="Email"
             />
           </View>
 
-          <View style={{ marginTop: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "gray" }}>
-              Password
-            </Text>
-
+          <View
+            className="signIn-pass-input"
+            style={{
+              marginTop: 20,
+              borderColor: "gray",
+              borderWidth: 0.5,
+              borderRadius: 10,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+            }}
+          >
+            <Icon style={styles.icon} name="lock" size={18} color="gray" />
             <TextInput
               value={password}
               onChangeText={(text) => setPassword(text)}
-              secureTextEntry={true}
               style={{
-                fontSize: email ? 18 : 18,
-                borderBottomColor: "gray",
-                borderBottomWidth: 1,
-                marginVertical: 10,
-                width: 300,
+                fontSize: password ? 18 : 18,
+                flex: 1,
+                padding: 10,
               }}
-              placeholderTextColor={"black"}
-              placeholder="Passowrd"
+              placeholder="Password"
             />
           </View>
-
+          <Pressable style={{ marginTop: 15 }}>
+            <Text style={{ textAlign: "right", color: "gray", fontSize: 14 }}>
+              Forgot password ?
+            </Text>
+          </Pressable>
           <Pressable
             onPress={handleLogin}
             style={{
-              width: 200,
+              width: 350,
               backgroundColor: "#4A55A2",
               padding: 15,
-              marginTop: 50,
+              marginTop: 100,
               marginLeft: "auto",
               marginRight: "auto",
-              borderRadius: 6,
+              borderRadius: 10,
             }}
           >
             <Text
@@ -140,18 +164,26 @@ const LoginScreen = () => {
                 textAlign: "center",
               }}
             >
-              Login
+              Sign In
             </Text>
           </Pressable>
-
-          <Pressable
-            onPress={() => navigation.navigate("Register")}
-            style={{ marginTop: 15 }}
-          >
+          <Pressable style={{ marginTop: 25 }}>
             <Text style={{ textAlign: "center", color: "gray", fontSize: 16 }}>
-              Dont't have an account? Sign Up
+              Don't Have an account?{" "}
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "#4A55A2",
+                  fontSize: 16,
+                  fontWeight: "600",
+                }}
+                onPress={() => navigation.navigate("Register")}
+              >
+                Sign Up
+              </Text>
             </Text>
           </Pressable>
+          
         </View>
       </KeyboardAvoidingView>
     </View>

@@ -6,10 +6,13 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Alert,
+  Image,
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import logo from "../assets/logo.png";
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -27,7 +30,7 @@ const RegisterScreen = () => {
 
     // send a POST  request to the backend API to register the user
     axios
-      .post("http://192.168.1.14:8000/register", user)
+      .post("http://192.168.2.10:8000/register", user)
       .then((response) => {
         console.log(response);
         Alert.alert(
@@ -64,107 +67,133 @@ const RegisterScreen = () => {
             alignItems: "center",
           }}
         >
-          <Text style={{ color: "#4A55A2", fontSize: 17, fontWeight: "600" }}>
-            Register
-          </Text>
-
-          <Text style={{ fontSize: 17, fontWeight: "600", marginTop: 15 }}>
-            Register To your Account
+          <Image
+            source={logo}
+            style={{ width: 180, height: 100, alignSelf: "center" }}
+          />
+          <Text
+            style={{
+              color: "#4A55A2",
+              fontSize: 17,
+              fontWeight: "600",
+              marginTop: 20,
+            }}
+          >
+            Sign Up
           </Text>
         </View>
 
-        <View style={{ marginTop: 50 }}>
-          <View style={{ marginTop: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "gray" }}>
-              Name
-            </Text>
-
+        <View style={{ marginTop: 40, width: 350 }}>
+          <View
+            className="signUp-name-input"
+            style={{
+              borderColor: "gray",
+              borderWidth: 0.5,
+              borderRadius: 10,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+            }}
+          >
+            <Icon style={styles.icon} name="account" size={18} color="gray" />
             <TextInput
               value={name}
               onChangeText={(text) => setName(text)}
               style={{
-                fontSize: email ? 18 : 18,
-                borderBottomColor: "gray",
-                borderBottomWidth: 1,
-                marginVertical: 10,
-                width: 300,
+                fontSize: name ? 18 : 18,
+                flex: 1,
+                padding: 10,
               }}
-              placeholderTextColor={"black"}
-              placeholder="Enter your name"
+              placeholder="Name"
             />
           </View>
-
-          <View>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "gray" }}>
-              Email
-            </Text>
-
+          <View
+            className="signUp-email-input"
+            style={{
+              borderColor: "gray",
+              borderWidth: 0.5,
+              borderRadius: 10,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+              marginTop: 20,
+            }}
+          >
+            <Icon style={styles.icon} name="email" size={18} color="gray" />
             <TextInput
               value={email}
               onChangeText={(text) => setEmail(text)}
               style={{
                 fontSize: email ? 18 : 18,
-                borderBottomColor: "gray",
-                borderBottomWidth: 1,
-                marginVertical: 10,
-                width: 300,
+                flex: 1,
+                padding: 10,
               }}
-              placeholderTextColor={"black"}
-              placeholder="enter Your Email"
+              placeholder="Email"
             />
           </View>
 
-          <View style={{ marginTop: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "gray" }}>
-              Password
-            </Text>
-
+          <View
+            className="signUp-password-input"
+            style={{
+              borderColor: "gray",
+              borderWidth: 0.5,
+              borderRadius: 10,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+              marginTop: 20,
+            }}
+          >
+            <Icon style={styles.icon} name="lock" size={18} color="gray" />
             <TextInput
               value={password}
               onChangeText={(text) => setPassword(text)}
-              secureTextEntry={true}
               style={{
-                fontSize: email ? 18 : 18,
-                borderBottomColor: "gray",
-                borderBottomWidth: 1,
-                marginVertical: 10,
-                width: 300,
+                fontSize: password ? 18 : 18,
+                flex: 1,
+                padding: 10,
               }}
-              placeholderTextColor={"black"}
               placeholder="Passowrd"
             />
           </View>
-
-          <View style={{ marginTop: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "gray" }}>
-              Image
-            </Text>
-
+          <View
+            className="signUp-image-input"
+            style={{
+              borderColor: "gray",
+              borderWidth: 0.5,
+              borderRadius: 10,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+              marginTop: 20,
+            }}
+          >
+            <Icon style={styles.icon} name="image" size={18} color="gray" />
             <TextInput
               value={image}
               onChangeText={(text) => setImage(text)}
               style={{
-                fontSize: email ? 18 : 18,
-                borderBottomColor: "gray",
-                borderBottomWidth: 1,
-                marginVertical: 10,
-                width: 300,
+                fontSize: image ? 18 : 18,
+                flex: 1,
+                padding: 10,
               }}
-              placeholderTextColor={"black"}
               placeholder="Image"
             />
           </View>
-
           <Pressable
             onPress={handleRegister}
             style={{
-              width: 200,
+              width: 350,
               backgroundColor: "#4A55A2",
               padding: 15,
               marginTop: 50,
               marginLeft: "auto",
               marginRight: "auto",
-              borderRadius: 6,
+              borderRadius: 10,
             }}
           >
             <Text
@@ -175,18 +204,26 @@ const RegisterScreen = () => {
                 textAlign: "center",
               }}
             >
-              Register
+              Sign Up
             </Text>
           </Pressable>
-
-          <Pressable
-            onPress={() => navigation.goBack()}
-            style={{ marginTop: 15 }}
-          >
+          <Pressable style={{ marginTop: 25 }}>
             <Text style={{ textAlign: "center", color: "gray", fontSize: 16 }}>
-              Already Have an account? Sign in
+            Already Have an account?{" "}
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "#4A55A2",
+                  fontSize: 16,
+                  fontWeight: "600",
+                }}
+                onPress={() => navigation.goBack()}
+              >
+                Sign In
+              </Text>
             </Text>
           </Pressable>
+          
         </View>
       </KeyboardAvoidingView>
     </View>
