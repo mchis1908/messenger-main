@@ -13,13 +13,29 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import logo from "../assets/logo.png";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { FIREBASE_AUTH } from "../FirebaseConfig";
 
 const RegisterScreen = () => {
+  const auth = FIREBASE_AUTH;
+
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [image, setImage] = useState("");
   const navigation = useNavigation();
+
+  const handleSignUp = async () => {
+    try {
+      const response = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(response);
+      alert("Registration successful");
+    } catch (error) {
+      alert("Registration failed: " + error.message);
+      console.log("error", error);
+    }
+  }
+
   const handleRegister = () => {
     const user = {
       name: name,
@@ -185,7 +201,7 @@ const RegisterScreen = () => {
             />
           </View>
           <Pressable
-            onPress={handleRegister}
+            onPress={handleSignUp}
             style={{
               width: 350,
               backgroundColor: "#4A55A2",

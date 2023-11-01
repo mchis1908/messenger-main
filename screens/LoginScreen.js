@@ -10,58 +10,35 @@ import {
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import logo from "../assets/logo.png";
+import { FIREBASE_AUTH } from "../FirebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const LoginScreen = () => {
+  const auth = FIREBASE_AUTH;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-  // useEffect(() => {
-  //   const checkLoginStatus = async () => {
-  //     try {
-  //       const token = await AsyncStorage.getItem("authToken");
 
-  //       if (token) {
-  //         navigation.replace("Home");
-  //       } else {
-  //         // token not found , show the login screen itself
-  //       }
-  //     } catch (error) {
-  //       console.log("error", error);
-  //     }
-  //   };
+  const handleSignIn = async () => {
+    try {
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      console.log(response);
+      navigation.navigate("Home");
+    } catch (error) {
+      alert("Login failed: " + error.message);
+      console.log("error", error);
+    }
+  }
 
-  //   checkLoginStatus();
-  // }, []);
-  const handleLogin = () => {
-    const user = {
-      email: email,
-      password: password,
-    };
-
-    axios
-      .post("http://192.168.2.10:8000/login", user)
-      .then((response) => {
-        console.log(response);
-        const token = response.data.token;
-        AsyncStorage.setItem("authToken", token);
-
-        navigation.replace("Home");
-      })
-      .catch((error) => {
-        Alert.alert("Login Error", "Invalid email or password");
-        console.log("Login Error", error);
-      });
-  };
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: "white",
         alignItems: "center",
-        padding:10,
+        padding: 10,
       }}
     >
       <KeyboardAvoidingView>
@@ -89,7 +66,7 @@ const LoginScreen = () => {
         </View>
 
         <View style={{ marginTop: 40, width: 350 }}>
-          <View 
+          <View
             className="signIn-email-input"
             style={{
               borderColor: "gray",
@@ -145,7 +122,7 @@ const LoginScreen = () => {
             </Text>
           </Pressable>
           <Pressable
-            onPress={handleLogin}
+            onPress={handleSignIn}
             style={{
               width: 350,
               backgroundColor: "#4A55A2",
@@ -183,7 +160,6 @@ const LoginScreen = () => {
               </Text>
             </Text>
           </Pressable>
-          
         </View>
       </KeyboardAvoidingView>
     </View>
