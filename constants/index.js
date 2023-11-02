@@ -1,4 +1,4 @@
-export const apiKey = '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';
+export const apiKey = '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';
 // in some cases your api key maybe already expired
 // try to use a new account to create an api key
 

@@ -3,7 +3,6 @@ import React, { useLayoutEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import User from "../components/User";
 import Navigation from "../components/Navigation";
-import Header from "../components/Header";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -15,14 +14,6 @@ const HomeScreen = () => {
           <User key={index} item={item} />
         ))}
       </View> */}
-      {/* <Pressable
-        onPress={() => navigation.navigate("Login")}
-        style={{ marginTop: 15 }}
-      >
-        <Text style={{ textAlign: "center", color: "gray", fontSize: 16 }}>
-          Logout
-        </Text>
-      </Pressable> */}
       <View style={{position:'absolute', bottom:0, width:'100%'}}>
         <Navigation/>
       </View>

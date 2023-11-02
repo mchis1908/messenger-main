@@ -31,10 +31,10 @@ const route = useRoute();
             )
         }
         {
-            route.name === 'AIAssistant' ? (
+            route.name === 'AIChat' ? (
                 <MaterialCommunityIcons name="robot-excited-outline" size={31} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8}}/>
             ) : (
-                <MaterialCommunityIcons name="robot-excited-outline" size={31} color="black" style={{ padding:4}} onPress={() => navigation.navigate("AIAssistant")}/>
+                <MaterialCommunityIcons name="robot-excited-outline" size={31} color="black" style={{ padding:4}} onPress={() => navigation.navigate("AIChat")}/>
             )
         }
         <Feather name="log-out" size={24} color="black" style={{ padding:4}} onPress={() => navigation.navigate("Login")}/>
