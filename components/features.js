@@ -6,7 +6,7 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 
 export default function Features() {
   return (
-    <ScrollView style={{ height: hp(55), bounces: false, showsVerticalScrollIndicator: false , paddingHorizontal:12}}>
+    <ScrollView style={{minHeight: hp(62), bounces: false, showsVerticalScrollIndicator: false , paddingHorizontal:12}}>
         <Text style={{ fontSize: wp(6.5), fontWeight: 'bold', color: '#333' }}>Features</Text>
 
         <View style={{ backgroundColor: '#6EE7C8', padding: hp(1), borderRadius: 10, marginVertical: hp(1) }}>

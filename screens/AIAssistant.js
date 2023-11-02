@@ -2,6 +2,8 @@ import Navigation from "../components/Navigation";
 import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
+  Pressable,
+  TextInput,
   Text,
   SafeAreaView,
   TouchableOpacity,
@@ -11,7 +13,7 @@ import {
 } from 'react-native';
 import Voice from '@react-native-community/voice';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import { apiCall } from 'api/openAI';
+import { apiCall } from '../api/openAI';
 import Features from '../components/features';
 import Tts from 'react-native-tts';
 
@@ -42,34 +44,6 @@ const App = () => {
     console.log('speech error: ',e);
   }
 
-  
-  const startRecording = async () => {
-    setRecording(true);
-    Tts.stop(); 
-    try {
-      await Voice.start('en-GB'); // en-US
-
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-  const stopRecording = async () => {
-    
-    try {
-      await Voice.stop();
-      setRecording(false);
-      fetchResponse();
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-  const clear = () => {
-    Tts.stop();
-    setSpeaking(false);
-    setLoading(false);
-    setMessages([]);
-  };
-
   const fetchResponse = async ()=>{
     if(result.trim().length>0){
       setLoading(true);
@@ -77,30 +51,24 @@ const App = () => {
       newMessages.push({role: 'user', content: result.trim()});
       setMessages([...newMessages]);
 
-      // scroll to the bottom of the view
       updateScrollView();
 
-      // fetching response from chatGPT with our prompt and old messages
       apiCall(result.trim(), newMessages).then(res=>{
         console.log('got api data');
         setLoading(false);
+        console.log(res)
         if(res.success){
           setMessages([...res.data]);
           setResult('');
           updateScrollView();
-
           // now play the response to user
           startTextToSpeach(res.data[res.data.length-1]);
-          
         }else{
           Alert.alert('Error', res.msg);
         }
-        
       })
     }
   }
-
-
 
   const updateScrollView = ()=>{
     setTimeout(()=>{
@@ -118,7 +86,6 @@ const App = () => {
       });
     }
   }
-  
 
   const stopSpeaking = ()=>{
     Tts.stop();
@@ -150,8 +117,8 @@ const App = () => {
 
   return (
     <View style={{flex:1, backgroundColor:'#fff'}}>
-        {/* <StatusBar barStyle="dark-content" /> */}
-        <SafeAreaView style={{flexDirection: 'column'}}>
+      {/* <StatusBar barStyle="dark-content" /> */}
+      <SafeAreaView style={{flexDirection: 'column'}}>
             {/* bot icon */}
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical:30 }}>
                 <Image
@@ -162,60 +129,114 @@ const App = () => {
 
             {/* features || message history */}
             {messages.length > 0 ? (
-                <View style={{ flex: 1, marginTop: 5 }}>
-                <Text style={{ color: 'gray', fontWeight: 'bold', marginLeft: 1, fontSize: wp(5) }}>
-                    Assistant
-                </Text>
-
-                <View style={{ height: hp(58), backgroundColor: '#f2f2f2', borderRadius: 16, padding: 16 }}>
-                    <ScrollView
-                    ref={scrollViewRef}
-                    bounces={false}
-                    style={{ paddingVertical: 16 }}
-                    showsVerticalScrollIndicator={false}
-                    >
-                    {messages.map((message, index) => {
-                        if (message.role === 'assistant') {
-                        if (message.content.includes('https')) {
-                            // result is an ai image
-                            return (
-                            <View key={index} style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                                <View style={{ padding: 8, flex: 1, borderRadius: 16, backgroundColor: '#81e6ad', borderTopRightRadius: 0 }}>
-                                <Image
-                                    source={{ uri: message.content }}
-                                    style={{ height: wp(60), width: wp(60), borderRadius: 16 }}
-                                />
-                                </View>
-                            </View>
-                            );
-                        } else {
-                            // chat gpt response
-                            return (
-                            <View key={index} style={{ width: wp(70), backgroundColor: '#81e6ad', padding: 8, borderRadius: 16, borderTopRightRadius: 0 }}>
-                                <Text style={{ color: '#444', fontSize: wp(4) }}>{message.content}</Text>
-                            </View>
-                            );
-                        }
-                        } else {
-                        // user input text
-                        return (
-                            <View key={index} style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <View style={{ width: wp(70), backgroundColor: 'white', padding: 8, borderRadius: 16, borderTopLeftRadius: 0 }}>
-                                <Text style={{ fontSize: wp(4) }}>{message.content}</Text>
-                            </View>
-                            </View>
-                        );
-                        }
-                    })}
-                    </ScrollView>
+                <View style={{ minHeight: hp(70), flex: 1, marginTop: 5, padding: 16 }}>
+                  <View style={{ backgroundColor: '#f2f2f2', borderRadius: 16 }}>
+                      <ScrollView
+                      ref={scrollViewRef}
+                      bounces={false}
+                      style={{ paddingVertical: 16 }}
+                      showsVerticalScrollIndicator={false}
+                      >
+                      {messages.map((message, index) => {
+                          if (message.role === 'assistant') {
+                          if (message.content.includes('https')) {
+                              // result is an ai image
+                              return (
+                              <View key={index} style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                                  <View style={{ padding: 8, flex: 1, borderRadius: 16, backgroundColor: '#81e6ad', borderTopRightRadius: 0 }}>
+                                  <Image
+                                      source={{ uri: message.content }}
+                                      style={{ height: wp(60), width: wp(60), borderRadius: 16 }}
+                                  />
+                                  </View>
+                              </View>
+                              );
+                          } else {
+                              // chat gpt response
+                              return (
+                              <View key={index} style={{ width: wp(70), backgroundColor: '#81e6ad', padding: 8, borderRadius: 16, borderTopRightRadius: 0 }}>
+                                  <Text style={{ color: '#444', fontSize: wp(4) }}>{message.content}</Text>
+                              </View>
+                              );
+                          }
+                          } else {
+                          // user input text
+                          return (
+                              <View key={index} style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                              <View style={{ width: wp(70), backgroundColor: 'white', padding: 8, borderRadius: 16, borderTopLeftRadius: 0 }}>
+                                  <Text style={{ fontSize: wp(4) }}>{message.content}</Text>
+                              </View>
+                              </View>
+                          );
+                          }
+                      })}
+                      </ScrollView>
+                  </View>
                 </View>
-                </View>
-            ) : (
-                <Features />
-            )}
+              ) : (
+                  <Features />
+              )}
 
-            {/* recording, clear and stop buttons */}
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 10,
+                paddingVertical: 10,
+                borderTopWidth: 1,
+                borderTopColor: "#dddddd",
+                marginBottom: 25,
+              }}
+            >
+              {/* <Entypo
+                onPress={handleEmojiPress}
+                style={{ marginRight: 5 }}
+                name="emoji-happy"
+                size={24}
+                color="gray"
+              /> */}
+
+              <TextInput
+                value={result}
+                onChangeText={(text) => setResult(text)}
+                style={{
+                  flex: 1,
+                  height: 40,
+                  borderWidth: 1,
+                  borderColor: "#dddddd",
+                  borderRadius: 20,
+                  paddingHorizontal: 10,
+                }}
+                placeholder="Type Your message..."
+              />
+
+              {/* <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 7,
+                  marginHorizontal: 8,
+                }}
+              >
+                <Entypo onPress={pickImage} name="camera" size={24} color="gray" />
+
+                <Feather name="mic" size={24} color="gray" />
+              </View> */}
+
+              <Pressable
+                onPress={() => fetchResponse()}
+                style={{
+                  backgroundColor: "#007bff",
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text>
+              </Pressable>
+            </View>
+
+            {/* <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 {loading ? (
                 <Image
                     source={require('../assets/images/loading.gif')}
@@ -223,7 +244,6 @@ const App = () => {
                 />
                 ) : recording ? (
                 <TouchableOpacity onPress={stopRecording}>
-                    {/* recording stop button */}
                     <Image
                     source={require('../assets/images/voiceLoading.gif')}
                     style={{ width: hp(10), height: hp(10), borderRadius: hp(10) / 2 }}
@@ -231,7 +251,6 @@ const App = () => {
                 </TouchableOpacity>
                 ) : (
                 <TouchableOpacity onPress={startRecording}>
-                    {/* recording start button */}
                     <Image
                     source={require('../assets/images/recordingIcon.png')}
                     style={{ width: hp(10), height: hp(10), borderRadius: hp(10) / 2 }}
@@ -250,8 +269,8 @@ const App = () => {
                     <Text style={{ color: 'white', fontWeight: 'bold' }}>Stop</Text>
                 </TouchableOpacity>
                 )}
-            </View>
-            </SafeAreaView>
+            </View> */}
+        </SafeAreaView>
       
         <View style={{position:'absolute', bottom:0, width:'100%'}}>
             <Navigation/>
