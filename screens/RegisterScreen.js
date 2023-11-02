@@ -172,7 +172,7 @@ const RegisterScreen = () => {
                 flex: 1,
                 padding: 10,
               }}
-              placeholder="Passowrd"
+              placeholder="Password"
             />
           </View>
           <View

@@ -8,6 +8,7 @@ import HomeScreen from "./screens/HomeScreen";
 import FriendsScreen from "./screens/FriendsScreen";
 import ChatsScreen from "./screens/ChatsScreen";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
+import AIAssistant from "./screens/AIAssistant";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -24,13 +25,15 @@ const StackNavigator = () => {
           component={RegisterScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
 
-        <Stack.Screen name="Friends" component={FriendsScreen} />
+        <Stack.Screen name="Friends" component={FriendsScreen} options={{ headerShown: false }}/>
 
-        <Stack.Screen name="Chats" component={ChatsScreen} />
+        <Stack.Screen name="Chats" component={ChatsScreen} options={{ headerShown: false }}/>
 
-        <Stack.Screen name="Messages" component={ChatMessagesScreen} />
+        <Stack.Screen name="Messages" component={ChatMessagesScreen} options={{ headerShown: false }}/>
+        
+        <Stack.Screen name="AIAssistant" component={AIAssistant} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
