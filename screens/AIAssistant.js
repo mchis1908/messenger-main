@@ -11,11 +11,9 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import Voice from '@react-native-community/voice';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { apiCall } from '../api/openAI';
 import Features from '../components/features';
-import Tts from 'react-native-tts';
 
 
 const App = () => {
@@ -75,45 +73,6 @@ const App = () => {
       scrollViewRef?.current?.scrollToEnd({ animated: true });
     },200)
   }
-
-  const startTextToSpeach = message=>{
-    if(!message.content.includes('https')){
-      setSpeaking(true);
-      // playing response with the voice id and voice speed
-      Tts.speak(message.content, {
-        iosVoiceId: 'com.Apple.ttsbundle.Samantha-compact',
-        rate: 0.5,
-      });
-    }
-  }
-
-  const stopSpeaking = ()=>{
-    Tts.stop();
-    setSpeaking(false);
-  }
-
-  useEffect(() => {
-
-    // voice handler events
-    Voice.onSpeechStart = speechStartHandler;
-    Voice.onSpeechEnd = speechEndHandler;
-    Voice.onSpeechResults = speechResultsHandler;
-    Voice.onSpeechError = speechErrorHandler;
-    
-    // text to speech events
-    // Tts.setDefaultLanguage('en-IE');
-    Tts.addEventListener('tts-start', event => console.log('start', event));
-    Tts.addEventListener('tts-finish', event => {console.log('finish', event); setSpeaking(false)});
-    Tts.addEventListener('tts-cancel', event => console.log('cancel', event));
-
-    
-    
-    return () => {
-      // destroy the voice instance after component unmounts
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
 
   return (
     <View style={{flex:1, backgroundColor:'#fff'}}>
@@ -235,41 +194,6 @@ const App = () => {
                 <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text>
               </Pressable>
             </View>
-
-            {/* <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                {loading ? (
-                <Image
-                    source={require('../assets/images/loading.gif')}
-                    style={{ width: hp(10), height: hp(10) }}
-                />
-                ) : recording ? (
-                <TouchableOpacity onPress={stopRecording}>
-                    <Image
-                    source={require('../assets/images/voiceLoading.gif')}
-                    style={{ width: hp(10), height: hp(10), borderRadius: hp(10) / 2 }}
-                    />
-                </TouchableOpacity>
-                ) : (
-                <TouchableOpacity onPress={startRecording}>
-                    <Image
-                    source={require('../assets/images/recordingIcon.png')}
-                    style={{ width: hp(10), height: hp(10), borderRadius: hp(10) / 2 }}
-                    />
-                </TouchableOpacity>
-                )}
-
-                {messages.length > 0 && (
-                <TouchableOpacity onPress={clear} style={{ backgroundColor: '#ccc', borderRadius: 16, padding: 8, position: 'absolute', right: 10 }}>
-                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Clear</Text>
-                </TouchableOpacity>
-                )}
-
-                {speaking && (
-                <TouchableOpacity onPress={stopSpeaking} style={{ backgroundColor: 'red', borderRadius: 16, padding: 8, position: 'absolute', left: 10 }}>
-                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Stop</Text>
-                </TouchableOpacity>
-                )}
-            </View> */}
         </SafeAreaView>
       
         <View style={{position:'absolute', bottom:0, width:'100%'}}>

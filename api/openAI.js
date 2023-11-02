@@ -21,6 +21,7 @@ export const apiCall = async (prompt, messages)=>{
                 content: `Does this message want to generate an AI picture, image, art or anything similar? ${prompt} . Simply answer with a yes or no.`
             }]
         });
+        // console.log(res);
         isArt = res.data?.choices[0]?.message?.content;
         isArt = isArt.trim();
         if(isArt.toLowerCase().includes('yes')){
