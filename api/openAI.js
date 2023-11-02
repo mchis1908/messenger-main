@@ -2,7 +2,7 @@ import { apiKey } from "../constants";
 import axios from 'axios';
 const client = axios.create({
     headers: {
-        "Authorization": "Bearer "+apiKey,
+        "Authorization": "Bearer " + apiKey,
         "Content-Type": "application/json"
     }
 })
@@ -18,10 +18,10 @@ export const apiCall = async (prompt, messages)=>{
             model: "gpt-3.5-turbo",
             messages: [{
                 role: 'user',
-                content: `Does this message want to generate an AI picture, image, art or anything similar? ${prompt} . Simply answer with a yes or no.`
+                content: `Is the ${prompt} about creating a picture, image, or any visual art? Please respond with either 'Yes' or 'No'`
             }]
         });
-        // console.log(res);
+        console.log(res);
         isArt = res.data?.choices[0]?.message?.content;
         isArt = isArt.trim();
         if(isArt.toLowerCase().includes('yes')){
