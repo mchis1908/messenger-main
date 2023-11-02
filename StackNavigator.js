@@ -8,7 +8,7 @@ import HomeScreen from "./screens/HomeScreen";
 import FriendsScreen from "./screens/FriendsScreen";
 import ChatsScreen from "./screens/ChatsScreen";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
-import AIAssistant from "./screens/AIAssistant";
+// import AIAssistant from "./screens/AIAssistant";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -33,7 +33,7 @@ const StackNavigator = () => {
 
         <Stack.Screen name="Messages" component={ChatMessagesScreen} options={{ headerShown: false }}/>
         
-        <Stack.Screen name="AIAssistant" component={AIAssistant} options={{ headerShown: false }}/>
+        {/* <Stack.Screen name="AIAssistant" component={AIAssistant} options={{ headerShown: false }}/> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
