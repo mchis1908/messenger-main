@@ -27,45 +27,28 @@ const RegisterScreen = () => {
 
   const handleSignUp = async () => {
     try {
-      const response = await createUserWithEmailAndPassword(auth, email, password);
-      console.log(response);
+      const response = await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+        const user = userCredential.user;
+        axios.post("http://localhost:8383/user", {
+        name: name,
+        email: email,
+        password: password,
+        image: image,
+        friendRequests: [],
+        friends: [],
+        sentFriendRequests: [],
+        id: user.uid,
+      })
       alert("Registration successful");
+      })
+      console.log(response);
+      
     } catch (error) {
       alert("Registration failed: " + error.message);
       console.log("error", error);
     }
   }
 
-  const handleRegister = () => {
-    const user = {
-      name: name,
-      email: email,
-      password: password,
-      image: image,
-    };
-
-    // send a POST  request to the backend API to register the user
-    axios
-      .post("http://192.168.2.10:8000/register", user)
-      .then((response) => {
-        console.log(response);
-        Alert.alert(
-          "Registration successful",
-          "You have been registered Successfully"
-        );
-        setName("");
-        setEmail("");
-        setPassword("");
-        setImage("");
-      })
-      .catch((error) => {
-        Alert.alert(
-          "Registration Error",
-          "An error occurred while registering"
-        );
-        console.log("registration failed", error);
-      });
-  };
   return (
     <View
       style={{

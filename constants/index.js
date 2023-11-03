@@ -1,4 +1,4 @@
-export const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+export const apiKey = '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';
 // in some cases your api key maybe already expired
 // try to use a new account to create an api key
 
