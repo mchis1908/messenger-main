@@ -38,9 +38,43 @@ exports.sendFriendRequest = async (req, res) => {
     const currentUserId = req.body.currentUserId;
     const selectedUserId = req.body.selectedUserId;
     await userService.sendFriendRequest(currentUserId, selectedUserId);
-    res.status(200)
+    res.status(200).json({ message: "Send request successfully" });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+exports.getFriendRequestById = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const userInfo = await userService.getFriendRequestById(userId);
+    res.status(200).json(userInfo);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+exports.acceptLinkRequest = async (req, res) => {
+  try {
+    const senderId = req.body.senderId;
+    const recipientId = req.body.recipientId;
+    await userService.acceptLinkRequest(senderId, recipientId);
+    res.status(200).json({ message: 'Link request accepted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+exports.getFriendById = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const users = await userService.getFriendById(userId);
+    res.status(200).json(users);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+
+

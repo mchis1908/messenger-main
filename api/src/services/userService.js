@@ -61,9 +61,112 @@ exports.sendFriendRequest = async (currentUserId, selectedUserId) => {
     });
 
     // Return the document ID
-    return currentUserId;
+    return updatedFriendRequests;
   } catch (error) {
     throw error;
   }
 }
+
+exports.getFriendRequestById = async (userId) => {
+  try {
+    // Fetch the user document based on the User id
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const userData = userDoc.data();
+    const friendRequests = userData.friendRequests || [];
+
+    // Search for users whose IDs are in the friendRequests array
+    const userPromises = friendRequests.map(async (friendId) => {
+      const friendRef = db.collection('users').doc(friendId);
+      const friendDoc = await friendRef.get();
+
+      if (friendDoc.exists) {
+        return friendDoc.data();
+      }
+    });
+
+    const friendsData = await Promise.all(userPromises);
+
+    return friendsData;
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+exports.acceptLinkRequest = async (senderId, recipientId ) => {
+  try {
+    const senderRef = db.collection('users').doc(senderId);
+    const recipientRef = db.collection('users').doc(recipientId);
+
+    const senderDoc = await senderRef.get();
+    const recipientDoc = await recipientRef.get();
+
+    if (!senderDoc.exists || !recipientDoc.exists) {
+      res.status(404).json({ message: "Sender or recipient not found" });
+      return;
+    }
+
+    const senderData = senderDoc.data();
+    const recipientData = recipientDoc.data();
+
+    senderData.friends.push(recipientId);
+    recipientData.friends.push(senderId);
+
+    recipientData.friendRequests = recipientData.friendRequests.filter(
+      (request) => request !== senderId
+    );
+
+    senderData.sentFriendRequests = senderData.sentFriendRequests.filter(
+      (request) => request !== recipientId
+    );
+
+    await senderRef.set(senderData);
+    await recipientRef.set(recipientData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+exports.getFriendById = async (userId) => {
+  try {
+    // Fetch the user document based on the User id
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      throw new Error('User not found');
+    }
+
+    const userData = userDoc.data();
+    const friendIds = userData.friends; // Assuming "friends" is an array of user IDs
+
+    if (!friendIds || friendIds.length === 0) {
+      return []; // No friends to fetch
+    }
+
+    const friendPromises = friendIds.map(async (friendId) => {
+      const friendRef = db.collection('users').doc(friendId);
+      const friendDoc = await friendRef.get();
+
+      if (friendDoc.exists) {
+        return friendDoc.data();
+      }
+    });
+
+    const friendsData = await Promise.all(friendPromises);
+
+    return friendsData;
+  } catch (error) {
+    throw error;
+  }
+}
+
 
