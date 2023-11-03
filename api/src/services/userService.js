@@ -67,7 +67,7 @@ exports.sendFriendRequest = async (currentUserId, selectedUserId) => {
   }
 }
 
-exports.getFriendRequestById = async (userId) => {
+exports.getFriendsRequestById = async (userId) => {
   try {
     // Fetch the user document based on the User id
     const userRef = db.collection('users').doc(userId);
@@ -135,7 +135,7 @@ exports.acceptLinkRequest = async (senderId, recipientId ) => {
   }
 }
 
-exports.getFriendById = async (userId) => {
+exports.getFriendsById = async (userId) => {
   try {
     // Fetch the user document based on the User id
     const userRef = db.collection('users').doc(userId);
@@ -169,4 +169,54 @@ exports.getFriendById = async (userId) => {
   }
 }
 
+exports.getSendFriendRequestById = async (userId) => {
+  try {
+    // Fetch the user document based on the User id
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
 
+    if (!userDoc.exists) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const userData = userDoc.data();
+    const sentFriendRequests = userData.sentFriendRequests || [];
+
+    // Search for users whose IDs are in the sentFriendRequests array
+    const userPromises = sentFriendRequests.map(async (friendId) => {
+      const friendRef = db.collection('users').doc(friendId);
+      const friendDoc = await friendRef.get();
+
+      if (friendDoc.exists) {
+        return friendDoc.data();
+      }
+    });
+
+    const friendsData = await Promise.all(userPromises);
+
+    return friendsData;
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+exports.getListIdFriends = async (userId) => {
+  try {
+    // Fetch the user document based on the User id
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userData = userDoc.data();
+    const friendIds = userData.friends || [];
+
+    return friendIds;
+  } catch (error) {
+    throw error;
+  }
+}

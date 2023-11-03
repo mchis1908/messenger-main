@@ -6,14 +6,14 @@ router.get('/:userId', userController.getUserInfo);
 router.post('/', userController.createUserInfo);
 router.get('/all/:userId', userController.getAllUsersExceptId);
 router.post('/friendRequest', userController.sendFriendRequest);
-router.get('/friend-request/:userId', userController.getFriendRequestById);
+router.get('/friend-request/:userId', userController.getFriendsRequestById);
 router.post('/friend-request/accept', userController.acceptLinkRequest);
-router.get('/accepted-friends/:userId', userController.getFriendById);
+router.get('/accepted-friends/:userId', userController.getFriendsById);
 // // ----post image-------- thiếu
-// router.post('/messages', userController.getFriendRequestById);
-// router.get('/messages/:senderId/:recepientId', userController.getFriendRequestById);
-// router.post('/deleteMessages', userController.getFriendRequestById);
-// router.get('/friend-requests/sent/:userId', userController.getFriendRequestById);
-// router.get('/friends/:userId', userController.getFriendRequestById);
+// router.post('/messages', userController.createMessage);
+// router.get('/messages/:senderId/:recepientId', userController.getFriendsRequestById);
+// router.post('/deleteMessages', userController.getFriendsRequestById);
+router.get('/friend-requests/sent/:userId', userController.getSendFriendRequestById);
+router.get('/friends/:userId', userController.getListIdFriends);
 
 module.exports = router;
