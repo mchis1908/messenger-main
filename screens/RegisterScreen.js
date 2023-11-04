@@ -15,6 +15,7 @@ import logo from "../assets/logo.png";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
+import { EXPO_PUBLIC_URL } from '@env'
 
 const RegisterScreen = () => {
   const auth = FIREBASE_AUTH;
@@ -29,7 +30,7 @@ const RegisterScreen = () => {
     try {
       const response = await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
         const user = userCredential.user;
-        axios.post("http://192.168.1.12:8383/user", {
+        axios.post(EXPO_PUBLIC_URL+ "/user", {
         name: name,
         email: email,
         password: password,

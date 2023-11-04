@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { UserType } from "../UserContext";
+import { EXPO_PUBLIC_URL } from '@env'
 
 const UserChat = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -10,7 +11,7 @@ const UserChat = ({ item }) => {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        `http://192.168.1.12:8383/messages/${userId}/${item._id}`
+        EXPO_PUBLIC_URL + `/user/messages/${userId}/${item._id}`
       );
       const data = await response.json();
 

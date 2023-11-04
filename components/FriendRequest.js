@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React, { useContext } from "react";
 import { UserType } from "../UserContext";
 import { useNavigation } from "@react-navigation/native";
+import { EXPO_PUBLIC_URL } from '@env'
 
 const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -9,7 +10,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const acceptRequest = async (friendRequestId) => {
     try {
       const response = await fetch(
-        "http://192.168.1.12:8383/friend-request/accept",
+        EXPO_PUBLIC_URL + `/user/friend-request/accept`,
         {
           method: "POST",
           headers: {
