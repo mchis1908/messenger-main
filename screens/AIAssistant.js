@@ -13,7 +13,6 @@ import {
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { apiCall } from '../api/openAI';
 import Features from '../components/features';
-import { apiKey } from '../constants';
 
 
 const App = () => {

@@ -1,8 +1,8 @@
-import { apiKey } from "../constants";
+import { OPENAI_API_KEY } from '@env'
 import axios from 'axios';
 const client = axios.create({
     headers: {
-        "Authorization": "Bearer " + apiKey,
+        "Authorization": "Bearer " + OPENAI_API_KEY,
         "Content-Type": "application/json"
     }
 })
