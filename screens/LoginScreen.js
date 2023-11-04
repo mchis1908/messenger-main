@@ -8,15 +8,17 @@ import {
   Image,
 } from "react-native";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
 import logo from "../assets/logo.png";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserType } from "../UserContext";
 
 const LoginScreen = () => {
   const auth = FIREBASE_AUTH;
+  const { userId, setUserId } = useContext(UserType);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +30,7 @@ const LoginScreen = () => {
       const user = response.user;
       const uid = user.uid;
       AsyncStorage.setItem("userId", uid);
+      setUserId(uid)
       navigation.navigate("Home");
     } catch (error) {
       alert("Login failed: " + error.message);

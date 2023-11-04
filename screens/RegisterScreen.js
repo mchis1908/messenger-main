@@ -31,14 +31,14 @@ const RegisterScreen = () => {
       const response = await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
         const user = userCredential.user;
         axios.post(EXPO_PUBLIC_URL+ "/user", {
-        name: name,
-        email: email,
-        password: password,
-        image: image,
-        friendRequests: [],
-        friends: [],
-        sentFriendRequests: [],
-        id: user.uid,
+          name: name,
+          email: email,
+          password: password,
+          image: image,
+          friendRequests: [],
+          friends: [],
+          sentFriendRequests: [],
+          id: user.uid,
       })
       alert("Registration successful");
       })

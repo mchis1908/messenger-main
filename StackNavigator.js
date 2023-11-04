@@ -15,7 +15,7 @@ const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -32,7 +32,7 @@ const StackNavigator = () => {
 
         <Stack.Screen name="Chats" component={ChatsScreen} options={{ headerShown: false }}/>
 
-        <Stack.Screen name="Messages" component={ChatMessagesScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="Messages" component={ChatMessagesScreen}/>
         
         <Stack.Screen name="AIAssistant" component={AIAssistant} />
 

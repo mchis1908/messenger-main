@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { UserType } from "../UserContext";
 import { EXPO_PUBLIC_URL } from '@env'
+import axios from "axios";
 
 const UserChat = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -11,12 +12,11 @@ const UserChat = ({ item }) => {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        `${EXPO_PUBLIC_URL}/user/messages/${userId}/${item._id}`
+        `${EXPO_PUBLIC_URL}/user/messages/${userId}/${item.id}`
       );
-      const data = await response.json();
 
-      if (response.ok) {
-        setMessages(data);
+      if (response.status === 200) {
+        setMessages(response.data);
       } else {
         console.log("error showing messags", response.status.message);
       }
@@ -49,7 +49,7 @@ const UserChat = ({ item }) => {
     <Pressable
       onPress={() =>
         navigation.navigate("Messages", {
-          recepientId: item._id,
+          recepientId: item.id,
         })
       }
       style={{

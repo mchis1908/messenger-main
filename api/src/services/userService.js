@@ -43,7 +43,6 @@ exports.getAllUsersExceptId = async (userId) => {
 
 exports.sendFriendRequest = async (currentUserId, selectedUserId) => {
   try {
-    // Get the current user's document
     const userRef = db.collection('users').doc(currentUserId);
     const userDoc = await userRef.get();
 
@@ -51,16 +50,27 @@ exports.sendFriendRequest = async (currentUserId, selectedUserId) => {
       throw new Error('User not found');
     }
 
-    // Update the friendRequests array
     const currentUserData = userDoc.data();
-    const updatedFriendRequests = [...currentUserData.friendRequests, selectedUserId];
+    const updatedFriendRequests = [...currentUserData.sentFriendRequests, selectedUserId];
 
-    // Set the updated data back to the document
     await userRef.update({
-      friendRequests: updatedFriendRequests
+      sentFriendRequests: updatedFriendRequests
     });
 
-    // Return the document ID
+    const selectedUserRef = db.collection('users').doc(selectedUserId);
+    const selectedUserDoc = await selectedUserRef.get();
+
+    if (!selectedUserDoc.exists) {
+      throw new Error('Selected user not found');
+    }
+
+    const selectedUserData = selectedUserDoc.data();
+    const updatedSentFriendRequests = [...selectedUserData.friendRequests, currentUserId];
+
+    await selectedUserRef.update({
+      friendRequests: updatedSentFriendRequests
+    });
+
     return updatedFriendRequests;
   } catch (error) {
     throw error;

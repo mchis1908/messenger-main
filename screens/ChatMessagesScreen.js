@@ -19,6 +19,7 @@ import { UserType } from "../UserContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { EXPO_PUBLIC_URL } from '@env'
+import axios from "axios";
 
 const ChatMessagesScreen = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -61,7 +62,7 @@ const ChatMessagesScreen = () => {
       );
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.status === 200) {
         setMessages(data);
       } else {
         console.log("error showing messags", response.status.message);
@@ -115,7 +116,7 @@ const ChatMessagesScreen = () => {
         body: formData,
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setMessage("");
         setSelectedImage("");
 
@@ -191,7 +192,7 @@ const ChatMessagesScreen = () => {
         body: JSON.stringify({ messages: messageIds }),
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setSelectedMessages((prevSelectedMessages) =>
         prevSelectedMessages.filter((id) => !messageIds.includes(id))
       );
@@ -223,16 +224,16 @@ const ChatMessagesScreen = () => {
   };
   const handleSelectMessage = (message) => {
     //check if the message is already selected
-    const isSelected = selectedMessages.includes(message._id);
+    const isSelected = selectedMessages.includes(message.id);
 
     if (isSelected) {
       setSelectedMessages((previousMessages) =>
-        previousMessages.filter((id) => id !== message._id)
+        previousMessages.filter((id) => id !== message.id)
       );
     } else {
       setSelectedMessages((previousMessages) => [
         ...previousMessages,
-        message._id,
+        message.id,
       ]);
     }
   };
@@ -241,13 +242,13 @@ const ChatMessagesScreen = () => {
       <ScrollView ref={scrollViewRef} contentContainerStyle={{flexGrow:1}} onContentSizeChange={handleContentSizeChange}>
         {messages.map((item, index) => {
           if (item.messageType === "text") {
-            const isSelected = selectedMessages.includes(item._id);
+            const isSelected = selectedMessages.includes(item.id);
             return (
               <Pressable
                 onLongPress={() => handleSelectMessage(item)}
                 key={index}
                 style={[
-                  item?.senderId?._id === userId
+                  item?.senderId?.id === userId
                     ? {
                         alignSelf: "flex-end",
                         backgroundColor: "#DCF8C6",
@@ -300,7 +301,7 @@ const ChatMessagesScreen = () => {
               <Pressable
                 key={index}
                 style={[
-                  item?.senderId?._id === userId
+                  item?.senderId?.id === userId
                     ? {
                         alignSelf: "flex-end",
                         backgroundColor: "#DCF8C6",

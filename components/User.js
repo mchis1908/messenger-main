@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
 import { UserType } from "../UserContext";
 import { EXPO_PUBLIC_URL } from '@env'
+import axios from "axios";
 
 const User = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -16,7 +17,7 @@ const User = ({ item }) => {
         );
 
         const data = await response.json();
-        if (response.ok) {
+        if (response.status===200) {
           setFriendRequests(data);
         } else {
           console.log("error", response.status);
@@ -36,7 +37,7 @@ const User = ({ item }) => {
 
         const data = await response.json();
 
-        if (response.ok) {
+        if (response.status === 200) {
           setUserFriends(data);
         } else {
           console.log("error retrieving user friends", response.status);
@@ -50,15 +51,20 @@ const User = ({ item }) => {
   }, []);
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     try {
-      const response = await fetch(`${EXPO_PUBLIC_URL}/user/friend-request`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ currentUserId, selectedUserId }),
+      // const response = await fetch(`${EXPO_PUBLIC_URL}/user/friend-request`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ currentUserId, selectedUserId }),
+      // });
+      const response = await axios.post(`${EXPO_PUBLIC_URL}/user/friend-request`, {
+        "currentUserId": currentUserId,
+        "selectedUserId": selectedUserId
       });
 
-      if (response.ok) {
+      console.log(response);
+      if (response.status === 200) {
         setRequestSent(true);
       }
     } catch (error) {
@@ -87,7 +93,7 @@ const User = ({ item }) => {
         <Text style={{ fontWeight: "bold" }}>{item?.name}</Text>
         <Text style={{ marginTop: 4, color: "gray" }}>{item?.email}</Text>
       </View>     
-      {userFriends.includes(item._id) ? (
+      {userFriends.includes(item.id) ? (
         <Pressable
           style={{
             backgroundColor: "#82CD47",
@@ -98,7 +104,7 @@ const User = ({ item }) => {
         >
           <Text style={{ textAlign: "center", color: "white" }}>Friends</Text>
         </Pressable>
-      ) : requestSent || friendRequests.some((friend) => friend._id === item._id) ? (
+      ) : requestSent || friendRequests.some((friend) => friend.id === item.id) ? (
         <Pressable
           style={{
             backgroundColor: "gray",
@@ -113,7 +119,7 @@ const User = ({ item }) => {
         </Pressable>
       ) : (
         <Pressable
-          onPress={() => sendFriendRequest(userId, item._id)}
+          onPress={() => sendFriendRequest(userId, item.id)}
           style={{
             backgroundColor: "#567189",
             padding: 10,

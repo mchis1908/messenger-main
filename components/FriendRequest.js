@@ -3,29 +3,34 @@ import React, { useContext } from "react";
 import { UserType } from "../UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { EXPO_PUBLIC_URL } from '@env'
+import axios from "axios";
 
 const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const { userId, setUserId } = useContext(UserType);
   const navigation = useNavigation();
   const acceptRequest = async (friendRequestId) => {
     try {
-      const response = await fetch(
-        `${EXPO_PUBLIC_URL}/user/friend-request/accept`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            senderId: friendRequestId,
-            recepientId: userId,
-          }),
-        }
-      );
+      // const response = await fetch(
+      //   `${EXPO_PUBLIC_URL}/user/friend-request/accept`,
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       senderId: friendRequestId,
+      //       recepientId: userId,
+      //     }),
+      //   }
+      // );
+      const response = await axios.post(`${EXPO_PUBLIC_URL}/user/friend-request/accept`, {
+        "senderId": friendRequestId,
+        "recipientId": userId
+      });
 
-      if (response.ok) {
+      if (response.status===200) {
         setFriendRequests(
-          friendRequests.filter((request) => request._id !== friendRequestId)
+          friendRequests.filter((request) => request.id !== friendRequestId)
         );
         navigation.navigate("Chats");
       }
@@ -54,7 +59,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
       </Text>
 
       <Pressable
-        onPress={() => acceptRequest(item._id)}
+        onPress={() => acceptRequest(item.id)}
         style={{ backgroundColor: "#0066b2", padding: 10, borderRadius: 6 }}
       >
         <Text style={{ textAlign: "center", color: "white" }}>Accept</Text>

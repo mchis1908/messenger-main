@@ -5,7 +5,7 @@ const userController = require('../controllers/userController');
 router.get('/:userId', userController.getUserInfo);
 router.post('/', userController.createUserInfo);
 router.get('/all/:userId', userController.getAllUsersExceptId);
-router.post('/friendRequest', userController.sendFriendRequest);
+router.post('/friend-request', userController.sendFriendRequest);
 router.get('/friend-request/:userId', userController.getFriendsRequestById);
 router.post('/friend-request/accept', userController.acceptLinkRequest);
 router.get('/accepted-friends/:userId', userController.getFriendsById);
