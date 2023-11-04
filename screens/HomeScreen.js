@@ -9,18 +9,15 @@ import { EXPO_PUBLIC_URL } from '@env'
 
 const HomeScreen = () => {
   const [users, setUsers] = useState([]);
-  const [userId, setUserId] = useState(null); // Use useState directly
-
+  // const [userId, setUserId] = useState(null);
+  const { userId, setUserId } = useContext(UserType);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const storedUserId = await AsyncStorage.getItem("userId");
         setUserId(storedUserId); // No need to use await here
   
-        // Fetch and set users based on userId
-        // const response = await axios.get(EXPO_PUBLIC_URL+ `/user/all/${storedUserId}`);
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${storedUserId}`);
-        // const response = await axios.get(`http://192.168.1.12:8383/user/all/${storedUserId}`);
         setUsers(response.data);
       } catch (error) {
         console.log("Error:", error);
@@ -32,11 +29,11 @@ const HomeScreen = () => {
   console.log("users:", users);
   return (
     <View style={{flex:1}}>
-      {/* <View style={{ padding: 25 }}>
+      <View style={{ padding: 25, paddingTop:40}}>
         {users.map((item, index) => (
           <User key={index} item={item} />
         ))}
-      </View> */}
+      </View>
       <View style={{position:'absolute', bottom:0, width:'100%'}}>
         <Navigation/>
       </View>
