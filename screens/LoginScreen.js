@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import logo from "../assets/logo.png";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
   const auth = FIREBASE_AUTH;
@@ -24,7 +25,9 @@ const LoginScreen = () => {
   const handleSignIn = async () => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
-      console.log(response);
+      const user = response.user;
+      const uid = user.uid;
+      AsyncStorage.setItem("userId", uid);
       navigation.navigate("Home");
     } catch (error) {
       alert("Login failed: " + error.message);

@@ -29,7 +29,7 @@ const RegisterScreen = () => {
     try {
       const response = await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
         const user = userCredential.user;
-        axios.post("http://localhost:8383/user", {
+        axios.post("http://192.168.1.12:8383/user", {
         name: name,
         email: email,
         password: password,
