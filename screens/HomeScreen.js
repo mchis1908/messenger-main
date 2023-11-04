@@ -18,7 +18,9 @@ const HomeScreen = () => {
         setUserId(storedUserId); // No need to use await here
   
         // Fetch and set users based on userId
-        const response = await axios.get(EXPO_PUBLIC_URL+ `/user/all/${storedUserId}`);
+        // const response = await axios.get(EXPO_PUBLIC_URL+ `/user/all/${storedUserId}`);
+        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${storedUserId}`);
+        // const response = await axios.get(`http://192.168.1.12:8383/user/all/${storedUserId}`);
         setUsers(response.data);
       } catch (error) {
         console.log("Error:", error);

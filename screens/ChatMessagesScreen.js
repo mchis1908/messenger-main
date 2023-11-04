@@ -57,7 +57,7 @@ const ChatMessagesScreen = () => {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        EXPO_PUBLIC_URL + `/user/messages/${userId}/${recepientId}`
+        `${EXPO_PUBLIC_URL}/user/messages/${userId}/${recepientId}`
       );
       const data = await response.json();
 
@@ -79,7 +79,7 @@ const ChatMessagesScreen = () => {
     const fetchRecepientData = async () => {
       try {
         const response = await fetch(
-          EXPO_PUBLIC_URL + `/user/${recepientId}`
+          `${EXPO_PUBLIC_URL}/user/${recepientId}`
         );
 
         const data = await response.json();
@@ -110,7 +110,7 @@ const ChatMessagesScreen = () => {
         formData.append("messageText", message);
       }
 
-      const response = await fetch(EXPO_PUBLIC_URL + `/user/messages`, {
+      const response = await fetch(`${EXPO_PUBLIC_URL}/user/messages`, {
         method: "POST",
         body: formData,
       });
@@ -183,7 +183,7 @@ const ChatMessagesScreen = () => {
 
   const deleteMessages = async (messageIds) => {
     try {
-      const response = await fetch(EXPO_PUBLIC_URL + `/user/deleteMessages`, {
+      const response = await fetch(`${EXPO_PUBLIC_URL}/user/deleteMessages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

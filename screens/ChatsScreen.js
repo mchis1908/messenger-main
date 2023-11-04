@@ -13,7 +13,7 @@ const ChatsScreen = () => {
     const acceptedFriendsList = async () => {
       try {
         const response = await fetch(
-          EXPO_PUBLIC_URL + `/user/accepted-friends/${userId}`
+          `${EXPO_PUBLIC_URL}/user/accepted-friends/${userId}`
         );
         const data = await response.json();
 

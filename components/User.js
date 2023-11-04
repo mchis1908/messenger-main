@@ -12,7 +12,7 @@ const User = ({ item }) => {
     const fetchFriendRequests = async () => {
       try {
         const response = await fetch(
-          EXPO_PUBLIC_URL + `/user/friend-requests/sent/${userId}`
+          `${EXPO_PUBLIC_URL}/user/friend-requests/sent/${userId}`
         );
 
         const data = await response.json();
@@ -32,7 +32,7 @@ const User = ({ item }) => {
   useEffect(() => {
     const fetchUserFriends = async () => {
       try {
-        const response = await fetch(EXPO_PUBLIC_URL + `/user/friends/${userId}`);
+        const response = await fetch(`${EXPO_PUBLIC_URL}/user/friends/${userId}`);
 
         const data = await response.json();
 
@@ -50,7 +50,7 @@ const User = ({ item }) => {
   }, []);
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     try {
-      const response = await fetch(EXPO_PUBLIC_URL + `/user/friend-request`, {
+      const response = await fetch(`${EXPO_PUBLIC_URL}/user/friend-request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

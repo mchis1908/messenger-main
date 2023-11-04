@@ -10,7 +10,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const acceptRequest = async (friendRequestId) => {
     try {
       const response = await fetch(
-        EXPO_PUBLIC_URL + `/user/friend-request/accept`,
+        `${EXPO_PUBLIC_URL}/user/friend-request/accept`,
         {
           method: "POST",
           headers: {
