@@ -11,28 +11,28 @@ const route = useRoute();
     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems:'center' ,width: '100%', backgroundColor: '#fff', padding:12}}>
         {
             route.name === 'Chats' ? (
-            <Ionicons name="chatbox-ellipses-outline" size={28} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8}} />
+            <Ionicons name="chatbox-ellipses-outline" size={28} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8, overflow: 'hidden'}} />
             ) : (
                 <Ionicons name="chatbox-ellipses-outline" size={28} color="black" style={{ padding: 4}} onPress={() => navigation.navigate("Chats")}/>
             )
         }
         {
             route.name === 'Friends' ? (
-            <Feather name="users" size={25} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8}} />
+            <Feather name="users" size={25} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8, overflow: 'hidden'}} />
             ) : (
                 <Feather name="users" size={25} color="black" style={{ padding: 4}} onPress={() => navigation.navigate("Friends")}/>
             )
         }
         {
             route.name === 'Home' ? (
-            <Feather name="home" size={28} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8}} />
+            <Feather name="home" size={28} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8, overflow: 'hidden'}} />
             ) : (
                 <Feather name="home" size={28} color="black" style={{ padding: 4}} onPress={() => navigation.navigate("Home")}/>
             )
         }
         {
             route.name === 'AIChat' ? (
-                <MaterialCommunityIcons name="robot-excited-outline" size={31} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8}}/>
+                <MaterialCommunityIcons name="robot-excited-outline" size={31} color="#fff" style={{ padding: 4, backgroundColor: '#04724F', borderRadius:10, opacity: 0.8, overflow: 'hidden'}}/>
             ) : (
                 <MaterialCommunityIcons name="robot-excited-outline" size={31} color="black" style={{ padding:4}} onPress={() => navigation.navigate("AIChat")}/>
             )

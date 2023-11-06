@@ -32,7 +32,13 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
         setFriendRequests(
           friendRequests.filter((request) => request.id !== friendRequestId)
         );
-        navigation.navigate("Chats");
+
+        await axios.post(`${EXPO_PUBLIC_URL}/conversation`, {
+          "user1Id": userId,
+          "user2Id": friendRequestId
+        }).then((response) => {
+          navigation.navigate("Chats");
+        })
       }
     } catch (err) {
       console.log("error acceptin the friend request", err);
