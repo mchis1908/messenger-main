@@ -6,7 +6,7 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 export default function AIChat() {
     const navigation = useNavigation();
   return (
-    <SafeAreaView style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-around', backgroundColor: 'white',marginHorizontal: 16 }}>
+    <SafeAreaView style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-around', backgroundColor: 'white'}}>
         <View style={{ marginTop: 16 }}>
             <Text style={{ fontSize: wp(10), textAlign: 'center', fontWeight: 'bold', color: 'gray' }}>
                 Jarvis

@@ -6,8 +6,8 @@ import HomeScreen from "./screens/HomeScreen";
 import FriendsScreen from "./screens/FriendsScreen";
 import ChatsScreen from "./screens/ChatsScreen";
 import AIChat from "./screens/AIChat";
-import Profile from "./screens/Profile";
-import { MaterialCommunityIcons, Ionicons, Feather } from '@expo/vector-icons'; 
+import Setting from "./screens/Setting";
+import { MaterialCommunityIcons, Ionicons, Feather, AntDesign } from '@expo/vector-icons'; 
 
 import { useRoute } from '@react-navigation/native';
 const TabNavigator = () => {
@@ -18,35 +18,37 @@ return (
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
+        tabBarStyle:{paddingTop: 5, borderTopLeftRadius:20,borderTopRightRadius:20,backgroundColor:'white',position:'absolute',height:60, alignSelf: "center"},
+        tabBarLabelStyle:{fontSize:14, paddingBottom:3},
     })}>
         <Tab.Screen name="Home" component={HomeScreen} options={{
           tabBarIcon: ({ focused, color, size }) => {
             return (
-                <Feather name="home" size={28} color={color}/>
+                <Feather name="home" size={25} color={color}/>
             )},
         }}/>
-        <Tab.Screen name="Friends Request" component={FriendsScreen} options={{
+        <Tab.Screen name="Friends" component={FriendsScreen} options={{
           tabBarIcon: ({ focused, color, size }) => {
             return (
-                <Feather name="users" size={25} color={color}/>
+                <Feather name="users" size={24} color={color}/>
             )},
         }}/>
         <Tab.Screen name="Chats" component={ChatsScreen} options={{
           tabBarIcon: ({ focused, color, size }) => {
             return (
-                <Ionicons name="chatbox-ellipses-outline" size={25} color={color}/>
+                <Ionicons name="chatbox-ellipses-outline" size={26} color={color}/>
             )},
         }}/>
         <Tab.Screen name="AIChat" component={AIChat} options={{
           tabBarIcon: ({ focused, color, size }) => {
             return (
-                <MaterialCommunityIcons name="robot-excited-outline" size={31} color={color}/>
+                <MaterialCommunityIcons name="robot-excited-outline" size={30} color={color}/>
             )},
         }}/>
-        <Tab.Screen name="Profile" component={Profile} options={{
+        <Tab.Screen name="Setting" component={Setting} options={{
           tabBarIcon: ({ focused, color, size }) => {
             return (
-                <Ionicons name="chatbox-ellipses-outline" size={25} color={color}/>
+                <AntDesign name="setting" size={26} color={color} />
             )},
         }}/>
     </Tab.Navigator>
