@@ -31,7 +31,7 @@ const LoginScreen = () => {
       const uid = user.uid;
       AsyncStorage.setItem("userId", uid);
       setUserId(uid)
-      navigation.navigate("Home");
+      navigation.navigate("TabNavigator");
     } catch (error) {
       alert("Login failed: " + error.message);
       console.log("error", error);

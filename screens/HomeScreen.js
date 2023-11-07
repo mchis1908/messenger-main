@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import React, { useLayoutEffect, useEffect, useState, useContext } from "react";
 import User from "../components/User";
-import Navigation from "../components/Navigation";
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -28,15 +27,10 @@ const HomeScreen = () => {
 
   console.log("users:", users);
   return (
-    <View style={{flex:1}}>
-      <View style={{ padding: 25, paddingTop:40}}>
-        {users.map((item, index) => (
-          <User key={index} item={item} />
-        ))}
-      </View>
-      <View style={{position:'absolute', bottom:0, width:'100%'}}>
-        <Navigation/>
-      </View>
+    <View style={{ padding: 25, paddingTop:40}}>
+      {users.map((item, index) => (
+        <User key={index} item={item} />
+      ))}
     </View>
   );
 };

@@ -4,7 +4,6 @@ import axios from "axios";
 import { UserType } from "../UserContext";
 import FriendRequest from "../components/FriendRequest";
 import { EXPO_PUBLIC_URL } from '@env'
-import Navigation from "../components/Navigation";
 
 const FriendsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
@@ -35,22 +34,17 @@ const FriendsScreen = () => {
 
   console.log(friendRequests);
   return (
-    <View style={{flex:1}}>
-      <View style={{ padding: 10, marginHorizontal: 12, paddingTop:40 }}>
-        {friendRequests.length > 0 && <Text style={{fontWeight:'bold', fontSize:18}}>Your Friend Requests!</Text>}
+    <View style={{ padding: 10, marginHorizontal: 12, paddingTop:40 }}>
+      {friendRequests.length > 0 && <Text style={{fontWeight:'bold', fontSize:18}}>Your Friend Requests!</Text>}
 
-        {friendRequests.map((item, index) => (
-          <FriendRequest
-            key={index}
-            item={item}
-            friendRequests={friendRequests}
-            setFriendRequests={setFriendRequests}
-          />
-        ))}
-      </View>
-      <View style={{position:'absolute', bottom:0, width:'100%'}}>
-        <Navigation/>
-      </View>
+      {friendRequests.map((item, index) => (
+        <FriendRequest
+          key={index}
+          item={item}
+          friendRequests={friendRequests}
+          setFriendRequests={setFriendRequests}
+        />
+      ))}
     </View>
   );
 };

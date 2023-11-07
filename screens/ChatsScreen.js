@@ -4,7 +4,6 @@ import { UserType } from "../UserContext";
 import { useNavigation } from "@react-navigation/native";
 import UserChat from "../components/UserChat";
 import { EXPO_PUBLIC_URL } from '@env'
-import Navigation from "../components/Navigation";
 import axios from "axios";
 
 const ChatsScreen = () => {
@@ -31,19 +30,13 @@ const ChatsScreen = () => {
   }, []);
   console.log("friends",acceptedFriends)
   return (
-    <View style={{flex:1}}>
-      <ScrollView showsVerticalScrollIndicator={false} style={{paddingTop:40}}>
-        <Pressable>
-            {acceptedFriends.map((item,index) => (
-                <UserChat key={index} item={item}/>
-            ))}
-        </Pressable>
-      </ScrollView>
-      <View style={{position:'absolute', bottom:0, width:'100%'}}>
-        <Navigation/>
-      </View>
-    </View>
-    
+    <ScrollView showsVerticalScrollIndicator={false} style={{paddingTop:40}}>
+      <Pressable>
+          {acceptedFriends.map((item,index) => (
+              <UserChat key={index} item={item}/>
+          ))}
+      </Pressable>
+    </ScrollView>
   );
 };
 
