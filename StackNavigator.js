@@ -4,18 +4,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
-import HomeScreen from "./screens/HomeScreen";
-import FriendsScreen from "./screens/FriendsScreen";
-import ChatsScreen from "./screens/ChatsScreen";
-import ChatMessagesScreen from "./screens/ChatMessagesScreen";
+import ForgotPass from "./screens/ForgotPass";
 import AIAssistant from "./screens/AIAssistant";
-import AIChat from "./screens/AIChat";
+import Navigation from "./components/Navigation";
+import ChatMessagesScreen from "./screens/ChatMessagesScreen";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Login" >
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -26,18 +24,16 @@ const StackNavigator = () => {
           component={RegisterScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
-
-        <Stack.Screen name="Friends" component={FriendsScreen} options={{ headerShown: false }}/>
-
-        <Stack.Screen name="Chats" component={ChatsScreen} options={{ headerShown: false }}/>
-
-        <Stack.Screen name="Messages" component={ChatMessagesScreen}/>
-        
+        <Stack.Screen
+          name="ForgotPass"
+          component={ForgotPass}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="MainScreen" component={Navigation} options={{ headerShown: false }}/>
         <Stack.Screen name="AIAssistant" component={AIAssistant} />
-
-        <Stack.Screen name="AIChat" component={AIChat} options={{ headerShown: false }}/>
+        <Stack.Screen name="Messages" component={ChatMessagesScreen} />
       </Stack.Navigator>
+      
     </NavigationContainer>
   );
 };

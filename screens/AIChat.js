@@ -32,7 +32,6 @@ export default function AIChat() {
             </TouchableOpacity>
         </SafeAreaView>
         <View style={{position:'absolute', bottom:0, width:'100%'}}>
-            <Navigation/>
         </View>
     </View>
     

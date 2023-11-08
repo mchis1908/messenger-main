@@ -13,42 +13,71 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import logo from "../assets/logo.png";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
-import { EXPO_PUBLIC_URL } from '@env'
+import { EXPO_PUBLIC_URL } from "@env";
+import NotifiactionModal from "../components/NotificationModal";
 
 const RegisterScreen = () => {
   const auth = FIREBASE_AUTH;
-
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [image, setImage] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigation = useNavigation();
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordMatchError, setPasswordMatchError] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      setPasswordMatchError(true);
+      return;
+    }
+
     try {
-      const response = await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      ).then((userCredential) => {
         const user = userCredential.user;
-        axios.post(EXPO_PUBLIC_URL+ "/user", {
+        axios.post(EXPO_PUBLIC_URL + "/user", {
           name: name,
           email: email,
           password: password,
-          image: image,
+          image: null,
           friendRequests: [],
           friends: [],
           sentFriendRequests: [],
           id: user.uid,
-      })
-      alert("Registration successful");
-      })
-      console.log(response);
-      
+        });
+      });
+      // Send email verification
+      sendEmailVerification(auth.currentUser).then(() => {
+        setAlertMessage("Registration successful. Email verification link sent.");
+        setShowAlert(true);
+        console.log(response);
+      });
     } catch (error) {
-      alert("Registration failed: " + error.message);
+      setAlertMessage("Registration failed: " + error.message);
+        setShowAlert(true);
       console.log("error", error);
     }
-  }
+  };
 
   return (
     <View
@@ -60,6 +89,11 @@ const RegisterScreen = () => {
       }}
     >
       <KeyboardAvoidingView>
+      <NotifiactionModal
+        message={alertMessage}
+        isVisible={showAlert}
+        onConfirm={() => setShowAlert(false)}
+      />
         <View
           style={{
             marginTop: 100,
@@ -96,12 +130,12 @@ const RegisterScreen = () => {
               paddingLeft: 10,
             }}
           >
-            <Icon style={styles.icon} name="account" size={18} color="gray" />
+            <Icon style={styles.icon} name="account" size={16} color="gray" />
             <TextInput
               value={name}
               onChangeText={(text) => setName(text)}
               style={{
-                fontSize: name ? 18 : 18,
+                fontSize: name ? 16 : 16,
                 flex: 1,
                 padding: 10,
               }}
@@ -121,12 +155,12 @@ const RegisterScreen = () => {
               marginTop: 20,
             }}
           >
-            <Icon style={styles.icon} name="email" size={18} color="gray" />
+            <Icon style={styles.icon} name="email" size={16} color="gray" />
             <TextInput
               value={email}
               onChangeText={(text) => setEmail(text)}
               style={{
-                fontSize: email ? 18 : 18,
+                fontSize: email ? 16 : 16,
                 flex: 1,
                 padding: 10,
               }}
@@ -147,22 +181,31 @@ const RegisterScreen = () => {
               marginTop: 20,
             }}
           >
-            <Icon style={styles.icon} name="lock" size={18} color="gray" />
+            <Icon style={styles.icon} name="lock" size={16} color="gray" />
             <TextInput
               value={password}
               onChangeText={(text) => setPassword(text)}
               style={{
-                fontSize: password ? 18 : 18,
+                fontSize: password ? 16 : 16,
                 flex: 1,
                 padding: 10,
               }}
               placeholder="Password"
+              secureTextEntry={!showPassword}
             />
+            <Pressable onPress={togglePasswordVisibility}>
+              <Icon
+                name={showPassword ? "eye-off" : "eye"}
+                size={16}
+                color="gray"
+              />
+            </Pressable>
           </View>
+
           <View
-            className="signUp-image-input"
+            className="signUp-confirm-password-input"
             style={{
-              borderColor: "gray",
+              borderColor: passwordMatchError ? "red" : "gray",
               borderWidth: 0.5,
               borderRadius: 10,
               flexDirection: "row",
@@ -172,18 +215,32 @@ const RegisterScreen = () => {
               marginTop: 20,
             }}
           >
-            <Icon style={styles.icon} name="image" size={18} color="gray" />
+            <Icon style={styles.icon} name="lock" size={16} color="gray" />
             <TextInput
-              value={image}
-              onChangeText={(text) => setImage(text)}
+              value={confirmPassword}
+              onChangeText={(text) => setConfirmPassword(text)}
               style={{
-                fontSize: image ? 18 : 18,
+                fontSize: confirmPassword ? 16 : 16,
                 flex: 1,
                 padding: 10,
               }}
-              placeholder="Image"
+              placeholder="Confirm Password"
+              secureTextEntry={!showConfirmPassword}
             />
+            <Pressable onPress={toggleConfirmPasswordVisibility}>
+              <Icon
+                name={showConfirmPassword ? "eye-off" : "eye"}
+                size={16}
+                color="gray"
+              />
+            </Pressable>
           </View>
+
+          {passwordMatchError && (
+            <Text style={{ color: "red", marginTop: 5 }}>
+              Passwords do not match
+            </Text>
+          )}
           <Pressable
             onPress={handleSignUp}
             style={{
@@ -209,7 +266,7 @@ const RegisterScreen = () => {
           </Pressable>
           <Pressable style={{ marginTop: 25 }}>
             <Text style={{ textAlign: "center", color: "gray", fontSize: 16 }}>
-            Already Have an account?{" "}
+              Already have an account?{" "}
               <Text
                 style={{
                   textAlign: "center",
@@ -223,7 +280,6 @@ const RegisterScreen = () => {
               </Text>
             </Text>
           </Pressable>
-          
         </View>
       </KeyboardAvoidingView>
     </View>
