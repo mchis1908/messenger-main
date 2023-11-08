@@ -55,7 +55,7 @@ const RegisterScreen = () => {
         password
       ).then((userCredential) => {
         const user = userCredential.user;
-        axios.post(EXPO_PUBLIC_URL + "/user", {
+        axios.post(`${EXPO_PUBLIC_URL}/user`, {
           name: name,
           email: email,
           password: password,
