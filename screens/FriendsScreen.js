@@ -4,7 +4,6 @@ import axios from "axios";
 import { UserType } from "../UserContext";
 import FriendRequest from "../components/FriendRequest";
 import { EXPO_PUBLIC_URL } from '@env'
-import Navigation from "../components/Navigation";
 
 const FriendsScreen = () => {
   const { userId, setUserId } = useContext(UserType);

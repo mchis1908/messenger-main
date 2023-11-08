@@ -4,7 +4,6 @@ import { UserType } from "../UserContext";
 import { useNavigation } from "@react-navigation/native";
 import UserChat from "../components/UserChat";
 import { EXPO_PUBLIC_URL } from '@env'
-import Navigation from "../components/Navigation";
 import axios from "axios";
 
 const ChatsScreen = () => {
