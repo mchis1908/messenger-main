@@ -12,11 +12,7 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const storedUserId = await AsyncStorage.getItem("userId");
-        setUserId(storedUserId);
-  
-        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${storedUserId}`);
-        console.log("response.data:", `${EXPO_PUBLIC_URL}/user/all/${storedUserId}`)
+        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${userId}`);
         setUsers(response.data);
       } catch (error) {
         console.log("Error:", error);
@@ -26,6 +22,7 @@ const HomeScreen = () => {
   }, []);
 
   console.log("users:", users);
+  console.log("userID:", userId);
 
   return (
     <View style={{ padding: 25, paddingTop:40}}>
