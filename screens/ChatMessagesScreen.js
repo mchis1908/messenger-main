@@ -20,10 +20,9 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { EXPO_PUBLIC_URL } from '@env'
 import axios from "axios";
-import { ref, onValue, query, limitToLast, onChildAdded, set } from 'firebase/database';
+import { ref, onValue, query, limitToLast, onChildAdded } from 'firebase/database';
 import { REAL_TIME_DATABASE, FIREBASE_STORAGE } from "../FirebaseConfig";
 import { getDownloadURL, uploadBytes, ref as storageRef } from "firebase/storage";
-import * as FileSystem from 'expo-file-system';
 
 const ChatMessagesScreen = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -31,24 +30,22 @@ const ChatMessagesScreen = () => {
   const [messages, setMessages] = useState([]);
   const [recepientData, setRecepientData] = useState();
   const navigation = useNavigation();
-  const [selectedImage, setSelectedImage] = useState("");
   const route = useRoute();
   const { recepientId, conversationId } = route.params;
   const [message, setMessage] = useState("");
   const { userId, setUserId } = useContext(UserType);
-  const [image, setImage] = useState(null);
 
   const scrollViewRef = useRef(null);
+ 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }, 100);
+  }
 
   useEffect(() => {
     scrollToBottom()
   },[]);
-
-  const scrollToBottom = () => {
-      if(scrollViewRef.current){
-          scrollViewRef.current.scrollToEnd({animated:false})
-      }
-  }
 
   const handleContentSizeChange = () => {
       scrollToBottom();
@@ -58,12 +55,9 @@ const ChatMessagesScreen = () => {
     setShowEmojiSelector(!showEmojiSelector);
   };
 
-
-
   const fetchMessages = async () => {
     try {
       const messagesRef = ref(REAL_TIME_DATABASE, `messages/${conversationId}`);
-      // const lastMessageQuery = query(messagesRef).limitToLast(1);
       onValue(messagesRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -120,7 +114,7 @@ const ChatMessagesScreen = () => {
 
   const getLastMessage = () => {
     try {
-      const messagesRef = query(ref(REAL_TIME_DATABASE, `messages/${conversationId}`), limitToLast(1));
+      const messagesRef = query(ref(REAL_TIME_DATABASE, `messages/${conversationId}`), limitToLast(1), "timestamp");
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
         messages.push(data)
@@ -213,42 +207,33 @@ const ChatMessagesScreen = () => {
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-
-    try {
-      const { uri } = await FileSystem.getInfoAsync(image);
-      const blob = await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-          resolve(xhr.response);
-        };
-        xhr.onerror = function (e) {
-          console.log(e);
-          reject(new TypeError("Network request failed"));
-        };
-        xhr.responseType = "blob";
-        xhr.open("GET", uri, true);
-        xhr.send(null);
-      })
-
-      const filename = image.substring(image.lastIndexOf('/') + 1);
-      const imageRef = ref(FIREBASE_STORAGE, filename);
-
-      await imageRef.put(blob);
-      setImage(null);
-    } catch (error) {
-      console.log("error uploading image", error);
-    }
+      const timestamp = new Date()
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.canceled) {
+        const ref = storageRef(FIREBASE_STORAGE, `messages/${conversationId}/${timestamp.getTime()}`);
+        const img = await fetch(result.assets[0].uri);
+        const bytes = await img.blob();
+        await uploadBytes(ref, bytes).then(async (snapshot) => {
+          getDownloadURL(ref).then((url) => {
+            console.log("url", url)
+            setMessage(url)
+            if (message) {
+              handleSendMessage("image");
+              console.log("message", message)
+            }
+          })
+        }).catch((error) => {
+          console.log("error uploading image", error)
+        })
+      }
   };
+
   const handleSelectMessage = (message) => {
     //check if the message is already selected
     const isSelected = selectedMessages.includes(message.id);
@@ -319,16 +304,16 @@ const ChatMessagesScreen = () => {
           }
 
           if (item.messageType === "image") {
-            const baseUrl =
-              "/Users/sujananand/Build/messenger-project/api/files/";
-            const imageUrl = item.imageUrl;
-            const filename = imageUrl.split("/").pop();
-            const source = { uri: baseUrl + filename };
+            // const baseUrl =
+            //   "/Users/sujananand/Build/messenger-project/api/files/";
+            // const imageUrl = item.imageUrl;
+            // const filename = imageUrl.split("/").pop();
+            const source = {uri: item.message};
             return (
               <Pressable
                 key={index}
                 style={[
-                  item?.senderId?.id === userId
+                  item?.senderId === userId
                     ? {
                         alignSelf: "flex-end",
                         backgroundColor: "#DCF8C6",
@@ -356,11 +341,9 @@ const ChatMessagesScreen = () => {
                     style={{
                       textAlign: "right",
                       fontSize: 9,
-                      position: "absolute",
-                      right: 10,
-                      bottom: 7,
-                      color: "white",
-                      marginTop: 5,
+                      
+                      color: "black",
+                      marginTop: 15,
                     }}
                   >
                     {formatTime(item?.timestamp)}
