@@ -1,11 +1,15 @@
 const express = require('express');
 const userRoutes = require('./src/routes/userRoutes'); 
+const conversationRoutes = require('./src/routes/conversationRoutes');
+const messageRoutes = require('./src/routes/messageRoutes');
 
 const app = express();
 
 app.use(express.json());
 
 app.use('/user', userRoutes);
+app.use('/conversation', conversationRoutes);
+app.use('/message', messageRoutes);
 // app.use('/chat', chatRoutes);
 
 

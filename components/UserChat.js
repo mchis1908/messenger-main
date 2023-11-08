@@ -8,39 +8,24 @@ import axios from "axios";
 const UserChat = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
   const [messages, setMessages] = useState([]);
+  const [participant, setParticipant] = useState(null);
   const navigation = useNavigation();
-  const fetchMessages = async () => {
-    try {
-      const response = await fetch(
-        `${EXPO_PUBLIC_URL}/user/messages/${userId}/${item.id}`
-      );
+  const [lastMessage, setLastMessage] = useState({});
 
-      if (response.status === 200) {
-        setMessages(response.data);
-      } else {
-        console.log("error showing messags", response.status.message);
-      }
-    } catch (error) {
-      console.log("error fetching messages", error);
-    }
-  };
 
   useEffect(() => {
-    fetchMessages();
+    // fetchMessages();
+    const getParticipant = () => {
+      if(item.participant_1.id === userId) {
+        setParticipant(item.participant_2)
+      } else {
+        setParticipant(item.participant_1)
+      }
+      setLastMessage(item.lastMessage)
+    }
+    getParticipant()
   }, []);
-  console.log(messages);
 
-  const getLastMessage = () => {
-    const userMessages = messages.filter(
-      (message) => message.messageType === "text"
-    );
-
-    const n = userMessages.length;
-
-    return userMessages[n - 1];
-  };
-  const lastMessage = getLastMessage();
-  console.log(lastMessage);
   const formatTime = (time) => {
     const options = { hour: "numeric", minute: "numeric" };
     return new Date(time).toLocaleString("en-US", options);
@@ -49,7 +34,8 @@ const UserChat = ({ item }) => {
     <Pressable
       onPress={() =>
         navigation.navigate("Messages", {
-          recepientId: item.id,
+          recepientId: participant.id,
+          conversationId: item.id
         })
       }
       style={{
@@ -66,21 +52,21 @@ const UserChat = ({ item }) => {
     >
       <Image
         style={{ width: 50, height: 50, borderRadius: 25, resizeMode: "cover" }}
-        source={{ uri: item?.image }}
+        source={{ uri: participant?.image }}
       />
 
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 15, fontWeight: "500" }}>{item?.name}</Text>
+        <Text style={{ fontSize: 15, fontWeight: "500" }}>{participant?.name}</Text>
         {lastMessage && (
           <Text style={{ marginTop: 3, color: "gray", fontWeight: "500" }}>
-            {lastMessage?.message}
+            {userId === lastMessage.senderId ? "You: " : ""}{lastMessage?.message}
           </Text>
         )}
       </View>
 
       <View>
         <Text style={{ fontSize: 11, fontWeight: "400", color: "#585858" }}>
-          {lastMessage && formatTime(lastMessage?.timeStamp)}
+          {lastMessage && formatTime(lastMessage?.timestamp)}
         </Text>
       </View>
     </Pressable>

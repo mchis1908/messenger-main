@@ -37,6 +37,7 @@ exports.getAllUsersExceptId = async (userId) => {
 
     return users;
   } catch (error) {
+    console.log(error)
     throw error;
   }
 }

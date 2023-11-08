@@ -28,9 +28,9 @@ const RegisterScreen = () => {
 
   const handleSignUp = async () => {
     try {
-      const response = await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+      await createUserWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
         const user = userCredential.user;
-        axios.post(EXPO_PUBLIC_URL+ "/user", {
+        await axios.post(EXPO_PUBLIC_URL+ "/user", {
           name: name,
           email: email,
           password: password,
@@ -39,10 +39,12 @@ const RegisterScreen = () => {
           friends: [],
           sentFriendRequests: [],
           id: user.uid,
+          conversations: []
+        }).then((response) => {
+          alert("Registration successful");
+          console.log(response);
+        })
       })
-      alert("Registration successful");
-      })
-      console.log(response);
       
     } catch (error) {
       alert("Registration failed: " + error.message);

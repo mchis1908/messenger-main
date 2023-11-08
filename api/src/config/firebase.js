@@ -1,5 +1,6 @@
 var admin = require("firebase-admin");
 var { getFirestore } = require("firebase-admin/firestore");
+var { getDatabase } = require("firebase-admin/database");
 
 var serviceAccount = require("../../creds.json");
 
@@ -9,4 +10,5 @@ admin.initializeApp({
 });
 
 const db = getFirestore();
-module.exports = { db };
+const rtdb = getDatabase();
+module.exports = { db, rtdb };

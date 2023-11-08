@@ -14,9 +14,11 @@ const HomeScreen = () => {
     const fetchUsers = async () => {
       try {
         const storedUserId = await AsyncStorage.getItem("userId");
+        console.log("storedUserId:", storedUserId);
         setUserId(storedUserId); // No need to use await here
   
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${storedUserId}`);
+        console.log("response.data:", `${EXPO_PUBLIC_URL}/user/all/${storedUserId}`)
         setUsers(response.data);
       } catch (error) {
         console.log("Error:", error);
