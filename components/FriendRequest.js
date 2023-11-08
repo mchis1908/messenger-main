@@ -1,13 +1,22 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { UserType } from "../UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { EXPO_PUBLIC_URL } from '@env'
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const { userId, setUserId } = useContext(UserType);
   const navigation = useNavigation();
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const userId = await AsyncStorage.getItem("userId");
+      await setUserId(userId);
+    };
+    fetchUsers();
+  }, []);
+
   const acceptRequest = async (friendRequestId) => {
     try {
       // const response = await fetch(

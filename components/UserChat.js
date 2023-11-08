@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { UserType } from "../UserContext";
 import { EXPO_PUBLIC_URL } from '@env'
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserChat = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -12,9 +13,10 @@ const UserChat = ({ item }) => {
   const navigation = useNavigation();
   const [lastMessage, setLastMessage] = useState({});
 
-
-  useEffect(() => {
+  useEffect( async () => {
     // fetchMessages();
+    const userId = await AsyncStorage.getItem("userId");
+    await setUserId(userId); 
     const getParticipant = () => {
       if(item.participant_1.id === userId) {
         setParticipant(item.participant_2)

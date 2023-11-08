@@ -1,34 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, {useEffect, useState, useContext } from "react";
-// import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from "./screens/HomeScreen";
 import FriendsScreen from "./screens/FriendsScreen";
 import ChatsScreen from "./screens/ChatsScreen";
 import AIChat from "./screens/AIChat";
 import Profile from "./screens/Profile";
-import { MaterialCommunityIcons, Ionicons, Feather, AntDesign } from '@expo/vector-icons'; 
-import { UserType } from "./UserContext";
-import { EXPO_PUBLIC_URL } from '@env'
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+import { MaterialCommunityIcons, Ionicons, Feather, AntDesign, FontAwesome5 } from '@expo/vector-icons'; 
 
-import { useRoute } from '@react-navigation/native';
-const TabNavigator = () => {
+const MainScreen = () => {
   const Tab = createBottomTabNavigator();
-  const route = useRoute();
-  const { userId, setUserId } = useContext(UserType);
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const storedUserId = await AsyncStorage.getItem("userId");
-        setUserId(storedUserId);
-      } catch (error) {
-        console.log("Error:", error);
-      }
-    };
-    fetchUsers();
-  }, []);
 return (
     <Tab.Navigator screenOptions={({ route }) => ({
         tabBarActiveTintColor: 'tomato',
@@ -46,7 +27,7 @@ return (
       <Tab.Screen name="Friends" component={FriendsScreen} options={{
         tabBarIcon: ({ focused, color, size }) => {
           return (
-              <Feather name="users" size={24} color={color}/>
+              <AntDesign name="adduser" size={26} color={color}/>
           )},
       }}/>
       <Tab.Screen name="Chats" component={ChatsScreen} options={{
@@ -61,16 +42,16 @@ return (
               <MaterialCommunityIcons name="robot-excited-outline" size={30} color={color}/>
           )},
       }}/>
-      <Tab.Screen name="Setting" component={Profile} options={{
+      <Tab.Screen name="Profile" component={Profile} options={{
         tabBarIcon: ({ focused, color, size }) => {
           return (
-              <AntDesign name="setting" size={26} color={color} />
+              <FontAwesome5 name="user" size={22} color={color} />
           )},
       }}/>
     </Tab.Navigator>
   );
 };
 
-export default TabNavigator;
+export default MainScreen;
 
 const styles = StyleSheet.create({});

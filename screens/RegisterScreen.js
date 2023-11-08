@@ -19,7 +19,7 @@ import {
 } from "firebase/auth";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import { EXPO_PUBLIC_URL } from "@env";
-import NotifiactionModal from "../components/NotificationModal";
+import NotificationModal from "../components/NotificationModal";
 
 const RegisterScreen = () => {
   const auth = FIREBASE_AUTH;
@@ -89,7 +89,7 @@ const RegisterScreen = () => {
       }}
     >
       <KeyboardAvoidingView>
-      <NotifiactionModal
+      <NotificationModal
         message={alertMessage}
         isVisible={showAlert}
         onConfirm={() => setShowAlert(false)}

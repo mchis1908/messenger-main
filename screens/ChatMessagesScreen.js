@@ -23,6 +23,7 @@ import axios from "axios";
 import { ref, onValue, query, limitToLast, onChildAdded } from 'firebase/database';
 import { REAL_TIME_DATABASE, FIREBASE_STORAGE } from "../FirebaseConfig";
 import { getDownloadURL, uploadBytes, ref as storageRef } from "firebase/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ChatMessagesScreen = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);

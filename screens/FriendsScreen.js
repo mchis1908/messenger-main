@@ -4,16 +4,23 @@ import axios from "axios";
 import { UserType } from "../UserContext";
 import FriendRequest from "../components/FriendRequest";
 import { EXPO_PUBLIC_URL } from '@env'
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FriendsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
   const [friendRequests, setFriendRequests] = useState([]);
   useEffect(() => {
-    fetchFriendRequests();
+    const fetchData = async () => {
+      const userId = await AsyncStorage.getItem("userId");
+      await setUserId(userId); 
+      fetchFriendRequests();
+    };
+    fetchData();
   }, []);
 
   const fetchFriendRequests = async () => {
     try {
+      
       const response = await axios.get(
         `${EXPO_PUBLIC_URL}/user/friend-request/${userId}`
       );

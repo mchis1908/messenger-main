@@ -2,6 +2,7 @@ import { View, Text, SafeAreaView, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AIChat() {
     const navigation = useNavigation();

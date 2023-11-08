@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { UserType } from "../UserContext";
 import { EXPO_PUBLIC_URL } from '@env'
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const User = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -63,7 +64,6 @@ const User = ({ item }) => {
         "selectedUserId": selectedUserId
       });
 
-      console.log(response);
       if (response.status === 200) {
         setRequestSent(true);
       }

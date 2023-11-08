@@ -9,9 +9,12 @@ import { EXPO_PUBLIC_URL } from '@env'
 const HomeScreen = () => {
   const [users, setUsers] = useState([]);
   const { userId, setUserId } = useContext(UserType);
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        const userId = await AsyncStorage.getItem("userId");
+        await setUserId(userId); 
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${userId}`);
         setUsers(response.data);
       } catch (error) {
@@ -20,9 +23,6 @@ const HomeScreen = () => {
     };
     fetchUsers();
   }, []);
-
-  console.log("users:", users);
-  console.log("userID:", userId);
 
   return (
     <View style={{ padding: 25, paddingTop:40}}>

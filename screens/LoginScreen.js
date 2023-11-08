@@ -33,8 +33,8 @@ const LoginScreen = () => {
       const user = response.user;
       if (user.emailVerified) {
         const uid = user.uid;
-        AsyncStorage.setItem("userId", uid);
-        navigation.navigate("TabNavigator");
+        await AsyncStorage.setItem("userId", uid);
+        navigation.navigate("MainScreen");
       } else {
         setAlertMessage("Email is not verified. Please verify your email before logging in.");
         setShowAlert(true);

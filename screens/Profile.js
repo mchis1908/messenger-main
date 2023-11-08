@@ -118,7 +118,10 @@ const Profile = () => {
         <Text style={buttonTextStyle}>Change Information</Text>
       </Pressable>
       <Pressable
-        onPress={() => navigation.navigate("Login")}
+        onPress={() => {
+          setUserId(null);
+          navigation.navigate("Login");
+        }}
         style={buttonStyle}
       >
         <Text style={buttonTextStyle}>Log Out</Text>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const NotificationModal = ({ message, isVisible, onConfirm }) => {
     return (
