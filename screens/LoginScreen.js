@@ -8,36 +8,43 @@ import {
   Image,
 } from "react-native";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import React, { useState, useEffect,useContext } from "react";
+import React, { useState} from "react";
 import { useNavigation } from "@react-navigation/native";
 import logo from "../assets/logo.png";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { UserType } from "../UserContext";
+import NotifiactionModal from "../components/NotificationModal";
 
 const LoginScreen = () => {
   const auth = FIREBASE_AUTH;
-  const { userId, setUserId } = useContext(UserType);
-
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   const handleSignIn = async () => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       const user = response.user;
-      const uid = user.uid;
-      AsyncStorage.setItem("userId", uid);
-      setUserId(uid)
-      navigation.navigate("Home");
+      if (user.emailVerified) {
+        const uid = user.uid;
+        AsyncStorage.setItem("userId", uid);
+        navigation.navigate("MainScreen");
+      } else {
+        setAlertMessage("Email is not verified. Please verify your email before logging in.");
+        setShowAlert(true);
+      }
     } catch (error) {
-      alert("Login failed: " + error.message);
+      setAlertMessage('Login failed: ' + error.message);
+      setShowAlert(true);
       console.log("error", error);
     }
   }
-
   return (
     <View
       style={{
@@ -48,6 +55,11 @@ const LoginScreen = () => {
       }}
     >
       <KeyboardAvoidingView>
+      <NotifiactionModal
+        message={alertMessage}
+        isVisible={showAlert}
+        onConfirm={() => setShowAlert(false)}
+      />
         <View
           style={{
             marginTop: 100,
@@ -84,12 +96,12 @@ const LoginScreen = () => {
               paddingLeft: 10,
             }}
           >
-            <Icon style={styles.icon} name="email" size={18} color="gray" />
+            <Icon style={styles.icon} name="email" size={16} color="gray" />
             <TextInput
               value={email}
               onChangeText={(text) => setEmail(text)}
               style={{
-                fontSize: email ? 18 : 18,
+                fontSize: email ? 16 : 16,
                 flex: 1,
                 padding: 10,
               }}
@@ -98,32 +110,41 @@ const LoginScreen = () => {
           </View>
 
           <View
-            className="signIn-pass-input"
-            style={{
-              marginTop: 20,
-              borderColor: "gray",
-              borderWidth: 0.5,
-              borderRadius: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              paddingRight: 10,
-              paddingLeft: 10,
-            }}
-          >
-            <Icon style={styles.icon} name="lock" size={18} color="gray" />
-            <TextInput
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              style={{
-                fontSize: password ? 18 : 18,
-                flex: 1,
-                padding: 10,
-              }}
-              placeholder="Password"
-            />
-          </View>
+        className="signIn-pass-input"
+        style={{
+          marginTop: 20,
+          borderColor: "gray",
+          borderWidth: 0.5,
+          borderRadius: 10,
+          flexDirection: "row",
+          alignItems: "center",
+          paddingRight: 10,
+          paddingLeft: 10,
+        }}
+      >
+        <Icon style={styles.icon} name="lock" size={16} color="gray" />
+        <TextInput
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+          style={{
+            fontSize: password ? 16 : 16,
+            flex: 1,
+            padding: 10,
+          }}
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+        />
+        <Pressable onPress={togglePasswordVisibility}>
+          <Icon
+            name={showPassword ? "eye-off" : "eye"} 
+            size={16}
+            color="gray"
+          />
+        </Pressable>
+      </View>
           <Pressable style={{ marginTop: 15 }}>
-            <Text style={{ textAlign: "right", color: "gray", fontSize: 14 }}>
+            <Text style={{ textAlign: "right", color: "gray", fontSize: 14 }}
+            onPress={() => navigation.navigate("ForgotPass")}>
               Forgot password ?
             </Text>
           </Pressable>

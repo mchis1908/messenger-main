@@ -54,7 +54,7 @@ const ChatsScreen = () => {
         </Pressable>
       </ScrollView>
       <View style={{position:'absolute', bottom:0, width:'100%'}}>
-        <Navigation/>
+        {/* <Navigation/> */}
       </View>
     </View>
     
