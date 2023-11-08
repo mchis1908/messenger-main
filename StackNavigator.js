@@ -6,10 +6,7 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ForgotPass from "./screens/ForgotPass";
 import AIAssistant from "./screens/AIAssistant";
-import Navigation from "./components/Navigation";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
-import AIAssistant from "./screens/AIAssistant";
-import AIChat from "./screens/AIChat";
 import TabNavigator from "./TabNavigator";
 
 const StackNavigator = () => {
@@ -22,11 +19,7 @@ const StackNavigator = () => {
         <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false }}/>
         <Stack.Screen name="Messages" component={ChatMessagesScreen}/>
         <Stack.Screen name="AIAssistant" component={AIAssistant} />
-        <Stack.Screen
-          name="ForgotPass"
-          component={ForgotPass}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="ForgotPass" component={ForgotPass}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

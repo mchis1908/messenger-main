@@ -89,7 +89,7 @@ const Profile = () => {
       alignItems: 'center',
     }}>
 
-<Avatar
+      <Avatar
         rounded
         source={{ uri: image || users.image }}  // Use the 'image' state as the source
         size="large"

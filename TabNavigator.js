@@ -7,6 +7,7 @@ import FriendsScreen from "./screens/FriendsScreen";
 import ChatsScreen from "./screens/ChatsScreen";
 import AIChat from "./screens/AIChat";
 import Setting from "./screens/Setting";
+import Profile from "./screens/Profile";
 import { MaterialCommunityIcons, Ionicons, Feather, AntDesign } from '@expo/vector-icons'; 
 
 import { useRoute } from '@react-navigation/native';
@@ -45,7 +46,7 @@ return (
                 <MaterialCommunityIcons name="robot-excited-outline" size={30} color={color}/>
             )},
         }}/>
-        <Tab.Screen name="Setting" component={Setting} options={{
+        <Tab.Screen name="Setting" component={Profile} options={{
           tabBarIcon: ({ focused, color, size }) => {
             return (
                 <AntDesign name="setting" size={26} color={color} />
