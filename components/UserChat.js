@@ -13,11 +13,11 @@ const UserChat = ({ item }) => {
   const navigation = useNavigation();
   const [lastMessage, setLastMessage] = useState({});
 
-  useEffect( async () => {
+  useEffect( () => {
     // fetchMessages();
-    const userId = await AsyncStorage.getItem("userId");
-    await setUserId(userId); 
-    const getParticipant = () => {
+    // const userId = await AsyncStorage.getItem("userId");
+    // await setUserId(userId); 
+    const getParticipant = async () => {
       if(item.participant_1.id === userId) {
         setParticipant(item.participant_2)
       } else {
@@ -26,7 +26,7 @@ const UserChat = ({ item }) => {
       setLastMessage(item.lastMessage)
     }
     getParticipant()
-  }, []);
+  }, [userId]);
 
   const formatTime = (time) => {
     const options = { hour: "numeric", minute: "numeric" };

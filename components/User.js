@@ -29,7 +29,7 @@ const User = ({ item }) => {
     };
 
     fetchFriendRequests();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const fetchUserFriends = async () => {
@@ -49,7 +49,7 @@ const User = ({ item }) => {
     };
 
     fetchUserFriends();
-  }, []);
+  }, [userId]);
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     try {
       // const response = await fetch(`${EXPO_PUBLIC_URL}/user/friend-request`, {
@@ -71,8 +71,6 @@ const User = ({ item }) => {
       console.log("error message", error);
     }
   };
-  console.log("friend requests sent", friendRequests);
-  console.log("user friends", userFriends);
   return (
     <Pressable
       style={{ flexDirection: "row", alignItems: "center", marginVertical: 10 }}

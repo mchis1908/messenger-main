@@ -32,7 +32,7 @@ const Profile = () => {
       }
     };
     fetchUsers();
-  }, []);
+  }, [userId]);
 
 
   const handleImageUpload = async () => {

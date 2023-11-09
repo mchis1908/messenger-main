@@ -9,13 +9,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const { userId, setUserId } = useContext(UserType);
   const navigation = useNavigation();
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const userId = await AsyncStorage.getItem("userId");
-      await setUserId(userId);
-    };
-    fetchUsers();
-  }, []);
+  // useEffect(() => {
+  //   const fetchUserId = async () => {
+  //     const userId = await AsyncStorage.getItem("userId");
+  //     await setUserId(userId);
+  //   };
+  //   fetchUserId();
+  // }, []);
 
   const acceptRequest = async (friendRequestId) => {
     try {

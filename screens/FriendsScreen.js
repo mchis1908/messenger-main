@@ -9,37 +9,30 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const FriendsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
   const [friendRequests, setFriendRequests] = useState([]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      const userId = await AsyncStorage.getItem("userId");
-      await setUserId(userId); 
-      fetchFriendRequests();
-    };
-    fetchData();
-  }, []);
-
-  const fetchFriendRequests = async () => {
-    try {
-      
-      const response = await axios.get(
-        `${EXPO_PUBLIC_URL}/user/friend-request/${userId}`
-      );
-      if (response.status === 200) {
-        const friendRequestsData = response.data.map((friendRequest) => ({
-          id: friendRequest.id,
-          name: friendRequest.name,
-          email: friendRequest.email,
-          image: friendRequest.image,
-        }));
-
-        setFriendRequests(friendRequestsData);
+    const fetchFriendRequests = async () => {
+      try {
+        const response = await axios.get(
+          `${EXPO_PUBLIC_URL}/user/friend-request/${userId}`
+        );
+        if (response.status === 200) {
+          const friendRequestsData = response.data.map((friendRequest) => ({
+            id: friendRequest.id,
+            name: friendRequest.name,
+            email: friendRequest.email,
+            image: friendRequest.image,
+          }));
+  
+          setFriendRequests(friendRequestsData);
+        }
+      } catch (err) {
+        console.log("error message", err);
       }
-    } catch (err) {
-      console.log("error message", err);
-    }
-  };
+    };
+    fetchFriendRequests();
+  }, [userId]);
 
-  console.log(friendRequests);
   return (
     <View style={{ padding: 10, marginHorizontal: 12, paddingTop:40 }}>
       {friendRequests.length > 0 && <Text style={{fontWeight:'bold', fontSize:18}}>Your Friend Requests!</Text>}

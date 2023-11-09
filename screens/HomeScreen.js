@@ -11,18 +11,26 @@ const HomeScreen = () => {
   const { userId, setUserId } = useContext(UserType);
   
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUserId = async () => {
+      const newUserId = await AsyncStorage.getItem("userId");
+      if (newUserId !== userId) {
+        setUserId(newUserId);
+      }
+    };
+    fetchUserId();
+  }, [userId]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const userId = await AsyncStorage.getItem("userId");
-        await setUserId(userId); 
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${userId}`);
         setUsers(response.data);
       } catch (error) {
         console.log("Error:", error);
       }
     };
-    fetchUsers();
-  }, []);
+    fetchData();
+  }, [userId]);
 
   return (
     <View style={{ padding: 25, paddingTop:40}}>
