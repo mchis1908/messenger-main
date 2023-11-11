@@ -15,6 +15,7 @@ const HomeScreen = () => {
       const newUserId = await AsyncStorage.getItem("userId");
       if (newUserId !== userId) {
         setUserId(newUserId);
+        console.log(userId)
       }
     };
     fetchUserId();
@@ -24,7 +25,9 @@ const HomeScreen = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${userId}`);
-        setUsers(response.data);
+        if (response) {
+          setUsers(response.data);
+        }
       } catch (error) {
         console.log("Error:", error);
       }

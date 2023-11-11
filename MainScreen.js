@@ -15,7 +15,7 @@ return (
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
-        tabBarStyle:{paddingTop: 5, borderTopLeftRadius:20,borderTopRightRadius:20,backgroundColor:'white',position:'absolute',height:60, alignSelf: "center"},
+        tabBarStyle:{paddingTop: 5, borderTopLeftRadius:20,borderTopRightRadius:20,backgroundColor:'white',position:'absolute',height:60, alignSelf: "center", height: 100},
         tabBarLabelStyle:{fontSize:14, paddingBottom:3},
     })}>
       <Tab.Screen name="Home" component={HomeScreen} options={{

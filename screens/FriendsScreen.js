@@ -27,11 +27,13 @@ const FriendsScreen = () => {
           setFriendRequests(friendRequestsData);
         }
       } catch (err) {
-        console.log("error message", err);
+        console.log("error message friend", err);
       }
     };
-    fetchFriendRequests();
-  }, [userId]);
+    if (userId) {
+      fetchFriendRequests();
+    }
+  }, []);
 
   return (
     <View style={{ padding: 10, marginHorizontal: 12, paddingTop:40 }}>
