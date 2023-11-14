@@ -59,16 +59,20 @@ const UserChat = ({ item }) => {
 
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 15, fontWeight: "500" }}>{participant?.name}</Text>
-        {lastMessage && (
+        {lastMessage.message ? (
           <Text style={{ marginTop: 3, color: "gray", fontWeight: "500" }}>
-            {userId === lastMessage.senderId ? "You: " : ""}{lastMessage?.message}
+            {userId === lastMessage.senderId ? "You: " : ""}{lastMessage.messageType === "text" ? lastMessage.message : "Image"}
+          </Text>
+        ) : (
+          <Text style={{ marginTop: 3, color: "gray", fontWeight: "500" }}>
+            No messages yet
           </Text>
         )}
       </View>
 
       <View>
         <Text style={{ fontSize: 11, fontWeight: "400", color: "#585858" }}>
-          {lastMessage && formatTime(lastMessage?.timestamp)}
+          {lastMessage.timestamp && formatTime(lastMessage?.timestamp)}
         </Text>
       </View>
     </Pressable>

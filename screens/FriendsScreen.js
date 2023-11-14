@@ -5,6 +5,7 @@ import { UserType } from "../UserContext";
 import FriendRequest from "../components/FriendRequest";
 import { EXPO_PUBLIC_URL } from '@env'
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const FriendsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
@@ -36,18 +37,27 @@ const FriendsScreen = () => {
   }, []);
 
   return (
-    <View style={{ padding: 10, marginHorizontal: 12, paddingTop:40 }}>
-      {friendRequests.length > 0 && <Text style={{fontWeight:'bold', fontSize:18}}>Your Friend Requests!</Text>}
-
-      {friendRequests.map((item, index) => (
-        <FriendRequest
-          key={index}
-          item={item}
-          friendRequests={friendRequests}
-          setFriendRequests={setFriendRequests}
-        />
-      ))}
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Text style={{fontSize:30,fontWeight:'bold',padding:20, alignSelf: "flex-start"}}>Friend Requests</Text>
+      </View>
+      <View style={{ padding: 10, marginHorizontal: 12 }}>
+        {
+          friendRequests.length > 0 ? (
+            friendRequests.map((friendRequest) => (
+              <FriendRequest
+                key={friendRequest.id}
+                friendRequest={friendRequest}
+              />
+            ))
+          ) : (
+            <Text style={{ fontSize: 20, textAlign: "center" }}>
+              No Friend Requests!
+            </Text>
+          )
+        }
+      </View>
+    </SafeAreaView>
   );
 };
 

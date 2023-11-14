@@ -8,11 +8,11 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import React, { useState, useContext, useLayoutEffect, useEffect,useRef } from "react";
+import React, { useState, useContext, useLayoutEffect, useEffect, useRef } from "react";
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Octicons } from '@expo/vector-icons';
 import { Entypo } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
 import { UserType } from "../UserContext";
@@ -24,25 +24,36 @@ import { ref, onValue, query, limitToLast, onChildAdded } from 'firebase/databas
 import { REAL_TIME_DATABASE, FIREBASE_STORAGE } from "../FirebaseConfig";
 import { getDownloadURL, uploadBytes, ref as storageRef } from "firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { HoldItem } from "react-native-hold-menu";
+import MessageItem from "../components/messageItem";
+import { EvilIcons, MaterialIcons } from '@expo/vector-icons'; 
+import { Modalize } from 'react-native-modalize';
 
 const ChatMessagesScreen = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
-  const [selectedMessages, setSelectedMessages] = useState([]);
+  const [selectedMessages, setSelectedMessages] = useState('');
   const [messages, setMessages] = useState([]);
   const [recepientData, setRecepientData] = useState();
   const navigation = useNavigation();
   const route = useRoute();
   const { recepientId, conversationId } = route.params;
-  const [message, setMessage] = useState("");
+  var [message, setMessage] = useState("");
   const { userId, setUserId } = useContext(UserType);
-
+  var [imageURL, setImageURL] = useState("");
+  var [selectedReply, setSelectedReply] = useState({})
   const scrollViewRef = useRef(null);
+  const modalizeRef = useRef();
+  const [recepientFriendListData, setRecepientFriendListData] = useState([]);
  
   const scrollToBottom = () => {
     setTimeout(() => {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }, 100);
   }
+
+  const onOpen = () => {
+    modalizeRef.current?.open();
+  };
 
   useEffect(() => {
     scrollToBottom()
@@ -68,7 +79,7 @@ const ChatMessagesScreen = () => {
         }
       });
     } catch (error) {
-      console.log("error fetching messages", error);
+      console.log("error fetching messages in fetch all", error);
     }
   };
 
@@ -86,6 +97,7 @@ const ChatMessagesScreen = () => {
         const data = await response.json();
         console.log("recepient data", recepientId)
         setRecepientData(data);
+        
       } catch (error) {
         console.log("error retrieving details", error);
       }
@@ -96,16 +108,27 @@ const ChatMessagesScreen = () => {
 
   const handleSendMessage = (messageType) => {
     const timestamp = new Date()
-    // console.log("conversationId", conversationId)
-    axios.post(`${EXPO_PUBLIC_URL}/message`, {
+
+    let payload = Object.keys(selectedReply).length > 0 ? {
       "conversationId": conversationId,
       "senderId": userId,
       "messageType": messageType,
-      "message": message,
+      "message": messageType === "text" ? message : imageURL,
+      "timestamp": timestamp.getTime(),
+      "replyFor": selectedReply.message,
+      "replyType": selectedReply.messageType,
+    } : {
+      "conversationId": conversationId,
+      "senderId": userId,
+      "messageType": messageType,
+      "message": messageType === "text" ? message : imageURL,
       "timestamp": timestamp.getTime()
-    }).then(() => {
+    }
+
+    axios.post(`${EXPO_PUBLIC_URL}/message`, payload).then(() => {
       setMessage("");
       getLastMessage()
+      setSelectedReply({})
     })
   }
 
@@ -121,7 +144,7 @@ const ChatMessagesScreen = () => {
         messages.push(data)
       })
     } catch (error) {
-      console.log("error fetching messages", error);
+      console.log("error fetching messages in lasttest", error);
     }
   }
 
@@ -137,23 +160,25 @@ const ChatMessagesScreen = () => {
             color="black"
           />
 
-          {selectedMessages.length > 0 ? (
+          {selectedMessages?.length > 0 ? (
             <View>
               <Text style={{ fontSize: 16, fontWeight: "500" }}>
-                {selectedMessages.length}
+                {selectedMessages?.length}
               </Text>
             </View>
           ) : (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 15,
-                  resizeMode: "cover",
-                }}
-                source={{ uri: recepientData?.image }}
-              />
+              <Pressable onPress={onOpen} style={{ borderWidth: 2, borderColor: "#A6CF98", padding: 2, borderRadius: "50%", alignItems: "center" }}>
+                <Image
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                    resizeMode: "cover",
+                  }}
+                  source={{ uri: recepientData?.image }}
+                />
+              </Pressable>
 
               <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
                 {recepientData?.name}
@@ -162,20 +187,13 @@ const ChatMessagesScreen = () => {
           )}
         </View>
       ),
-      headerRight: () =>
-        selectedMessages.length > 0 ? (
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <Ionicons name="md-arrow-redo-sharp" size={24} color="black" />
-            <Ionicons name="md-arrow-undo" size={24} color="black" />
-            <FontAwesome name="star" size={24} color="black" />
-            <MaterialIcons
-              onPress={() => deleteMessages(selectedMessages)}
-              name="delete"
-              size={24}
-              color="black"
-            />
-          </View>
-        ) : null,
+      headerRight: () => (
+          <Pressable>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+              <Entypo name="dots-three-vertical" size={16} color="black" />
+            </View>
+          </Pressable>
+        ) 
     });
   }, [recepientData, selectedMessages]);
 
@@ -202,10 +220,7 @@ const ChatMessagesScreen = () => {
       console.log("error deleting messages", error);
     }
   };
-  const formatTime = (time) => {
-    const options = { hour: "numeric", minute: "numeric" };
-    return new Date(time).toLocaleString("en-US", options);
-  };
+  
 
   const pickImage = async () => {
       const timestamp = new Date()
@@ -222,11 +237,13 @@ const ChatMessagesScreen = () => {
         const bytes = await img.blob();
         await uploadBytes(ref, bytes).then(async (snapshot) => {
           getDownloadURL(ref).then((url) => {
-            console.log("url", url)
-            setMessage(url)
-            if (message) {
+            setImageURL(url);
+            imageURL = url
+            console.log("image url", imageURL)
+            if (imageURL.length > 0) {
               handleSendMessage("image");
-              console.log("message", message)
+            } else {
+              console.log("There was an error uploading the image")
             }
           })
         }).catch((error) => {
@@ -235,126 +252,51 @@ const ChatMessagesScreen = () => {
       }
   };
 
-  const handleSelectMessage = (message) => {
-    //check if the message is already selected
-    const isSelected = selectedMessages.includes(message.id);
+  function handleReply(message) {
+    setSelectedReply(message)
+    console.log("reply in chat", message)
+  }
 
-    if (isSelected) {
-      setSelectedMessages((previousMessages) =>
-        previousMessages.filter((id) => id !== message.id)
-      );
-    } else {
-      setSelectedMessages((previousMessages) => [
-        ...previousMessages,
-        message.id,
-      ]);
-    }
-  };
+  async function handleDelete(message) {
+    axios.post(`${EXPO_PUBLIC_URL}/message/delete`, {
+      "conversationId": conversationId,
+      "timestamp": message.timestamp
+    })
+  }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F0F0F0" }}>
-      <ScrollView ref={scrollViewRef} contentContainerStyle={{flexGrow:1}} onContentSizeChange={handleContentSizeChange}>
-        {messages.map((item, index) => {
-          if (item.messageType === "text") {
-            const isSelected = selectedMessages.includes(item.id);
-            return (
-              <Pressable
-                onLongPress={() => handleSelectMessage(item)}
-                key={index}
-                style={[
-                  item?.senderId === userId
-                    ? {
-                        alignSelf: "flex-end",
-                        backgroundColor: "#DCF8C6",
-                        padding: 8,
-                        maxWidth: "60%",
-                        borderRadius: 7,
-                        margin: 10,
-                      }
-                    : {
-                        alignSelf: "flex-start",
-                        backgroundColor: "white",
-                        padding: 8,
-                        margin: 10,
-                        borderRadius: 7,
-                        maxWidth: "60%",
-                      },
-
-                  isSelected && { width: "100%", backgroundColor: "#F0FFFF" },
-                ]}
-              >
-                <Text
-                  style={{
-                    fontSize: 13,
-                    textAlign: isSelected ? "right" : "left",
-                  }}
-                >
-                  {item?.message}
-                </Text>
-                <Text
-                  style={{
-                    textAlign: "right",
-                    fontSize: 9,
-                    color: "gray",
-                    marginTop: 5,
-                  }}
-                >
-                  {formatTime(item.timestamp)}
-                </Text>
-              </Pressable>
-            );
-          }
-
-          if (item.messageType === "image") {
-            // const baseUrl =
-            //   "/Users/sujananand/Build/messenger-project/api/files/";
-            // const imageUrl = item.imageUrl;
-            // const filename = imageUrl.split("/").pop();
-            const source = {uri: item.message};
-            return (
-              <Pressable
-                key={index}
-                style={[
-                  item?.senderId === userId
-                    ? {
-                        alignSelf: "flex-end",
-                        backgroundColor: "#DCF8C6",
-                        padding: 8,
-                        maxWidth: "60%",
-                        borderRadius: 7,
-                        margin: 10,
-                      }
-                    : {
-                        alignSelf: "flex-start",
-                        backgroundColor: "white",
-                        padding: 8,
-                        margin: 10,
-                        borderRadius: 7,
-                        maxWidth: "60%",
-                      },
-                ]}
-              >
-                <View>
-                  <Image
-                    source={source}
-                    style={{ width: 200, height: 200, borderRadius: 7 }}
-                  />
-                  <Text
-                    style={{
-                      textAlign: "right",
-                      fontSize: 9,
-                      
-                      color: "black",
-                      marginTop: 15,
-                    }}
-                  >
-                    {formatTime(item?.timestamp)}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          }
-        })}
+      <ScrollView ref={scrollViewRef} contentContainerStyle={{flexGrow:1}} onContentSizeChange={handleContentSizeChange} style={styles.chatContainer}>
+        {messages.map((item, index) => (
+          <MessageItem item={item} key={item.timestamp} onReply={handleReply} onDelete={handleDelete}/>
+        ))}
       </ScrollView>
+
+      {
+        Object.keys(selectedReply).length > 0 && (
+          <View style={{ backgroundColor: "white", flexDirection: "column", gap: 10, alignItems: "center", paddingHorizontal: 15, paddingVertical: 8, borderTopRightRadius: 8, borderTopLeftRadius: 8, borderTopColor: "gray"}}>
+            <View style={{ alignSelf: "flex-start", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <Octicons name="reply" size={16} color="#000" />
+                <Text style={{ fontSize: 12, marginBottom: 5 }}>{`Replying to ${selectedReply.senderId === userId ? 'yourself' : recepientData.name}`}</Text>
+              </View>
+
+              <Pressable onPress={() => setSelectedReply({})} style={{ marginLeft: 10 }}>
+                <EvilIcons name="close" size={24} color="black" />
+              </Pressable>
+            </View>
+            <View style={{ backgroundColor: "white", paddingLeft: 10, flexDirection: "row", width: "100%", justifyContent: "space-between", borderLeftWidth: 2.5, borderLeftColor: '#a6cf98' }}>
+              {
+                selectedReply.messageType === "text" ? (
+                  <Text style={{ color: "darkgray" }}>{selectedReply?.message}</Text>
+                ) : (
+                  <Image source={{ uri: selectedReply.message }} style={{ width: 50, height: 70, borderRadius: 8 }}/>
+                )
+              }
+            </View>
+          </View>
+        )
+      }
 
       <View
         style={{
@@ -397,22 +339,44 @@ const ChatMessagesScreen = () => {
             marginHorizontal: 8,
           }}
         >
-          <Entypo onPress={pickImage} name="camera" size={24} color="gray" />
+          <Ionicons onPress={pickImage} name="camera" size={24} color="gray" />
 
-          <Feather name="mic" size={24} color="gray" />
+          <FontAwesome name="microphone" size={24} color="gray" />
         </View>
 
-        <Pressable
-          onPress={() => handleSendMessage("text")}
-          style={{
-            backgroundColor: "#007bff",
-            paddingVertical: 8,
-            paddingHorizontal: 12,
-            borderRadius: 20,
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text>
-        </Pressable>
+        {
+          message && (
+            <Pressable
+              onPress={() => handleSendMessage("text")}
+              style={{
+                backgroundColor: "#557c55",
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                borderRadius: 20,
+              }}
+            >
+              <Ionicons name="md-send" size={16} color="#fff" />
+            </Pressable>
+          )
+        }
+      <Modalize ref={modalizeRef} modalTopOffset={500}>
+        <View style={{ width: "100%", alignItems: "center", marginTop: 50, flexDirection: "column", gap: 10 }}>
+          <Pressable style={{ borderWidth: 3, borderColor: "#739072", padding: 5, borderRadius: 60, alignItems: "center", width: 120, height: 120 }}>
+            <Image
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: 50,
+                resizeMode: "cover",
+              }}
+              source={{ uri: recepientData?.image }}
+            />
+
+            <Text style={{ marginTop: 25, fontSize: 20, fontWeight: "bold", color: "#555843" }}>{recepientData?.name}</Text>
+            <Text style={{ marginTop: 5, fontSize: 16, width: 300, textAlign: "center", color: "#7EAA92" }}>{recepientData?.email}</Text>
+          </Pressable>
+        </View>
+      </Modalize>
       </View>
 
       {showEmojiSelector && (
@@ -429,4 +393,8 @@ const ChatMessagesScreen = () => {
 
 export default ChatMessagesScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  chatContainer: {
+
+  }
+});
