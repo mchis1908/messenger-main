@@ -24,8 +24,9 @@ const MessageItem = ({ item, onReply, onDelete }) => {
         await Clipboard.setStringAsync(item.message);
     }
 
-    function handleReplyMessage(item) {
-        onReply(item);
+    function handleReplyMessage(itemSelected) {
+        onReply(itemSelected);
+        console.log("owner", itemSelected.hasOwnProperty('replyFor'))
     }
     
     function handleDeleteMessage(item) {
@@ -36,7 +37,7 @@ const MessageItem = ({ item, onReply, onDelete }) => {
         return (
           <HoldItem items={MenuItems} key={item.timestamp}>
             {
-              item?.replyFor && item?.replyType === "text" ? (
+              item.hasOwnProperty('replyFor') ? (item?.replyType === "text" ? (
                 <View style={item?.senderId !== userId ? styles.replyMessage : styles.replyMessageOwner}>
                   <Text style={{color: '#474141'}}>
                     {item?.replyFor}
@@ -44,7 +45,7 @@ const MessageItem = ({ item, onReply, onDelete }) => {
                 </View>
               ) : (
                 <Image source={{ uri: item?.replyFor }} style={item?.senderId !== userId ? styles.replyImage : styles.replyImageOwner}/>
-              )
+              )) : (null)
             }
             <Pressable
               style={[

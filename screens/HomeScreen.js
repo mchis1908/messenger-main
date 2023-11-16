@@ -27,8 +27,9 @@ const HomeScreen = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/all/${userId}`);
-        if (response) {
+        if (response.status === 200) {
           setUsers(response.data);
+          console.log("users", users)
           setOriginalUserList(response.data);
         }
       } catch (error) {

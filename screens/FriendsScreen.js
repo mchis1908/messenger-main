@@ -25,6 +25,7 @@ const FriendsScreen = () => {
             image: friendRequest.image,
           }));
   
+          console.log("friendRequests", friendRequestsData)
           setFriendRequests(friendRequestsData);
         }
       } catch (err) {

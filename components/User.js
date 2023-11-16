@@ -40,6 +40,7 @@ const User = ({ item }) => {
 
         const data = await response.json();
 
+        console.log("response", data)
         if (response.status === 200) {
           setUserFriends(data);
         } else {

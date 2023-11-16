@@ -95,8 +95,8 @@ const ChatMessagesScreen = () => {
         );
 
         const data = await response.json();
-        console.log("recepient data", recepientId)
         setRecepientData(data);
+        console.log("recepient data", recepientId)
         
       } catch (error) {
         console.log("error retrieving details", error);

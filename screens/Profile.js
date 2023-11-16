@@ -12,6 +12,8 @@ import { FIREBASE_APP } from '../FirebaseConfig';
 import * as FileSystem from 'expo-file-system';
 import { doc, updateDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons, Feather, MaterialCommunityIcons, Octicons } from '@expo/vector-icons'; 
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -27,6 +29,7 @@ const Profile = () => {
 
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
         setUsers(response.data);
+        console.log("userData", users)
       } catch (error) {
         console.log("Error:", error);
       }
@@ -82,60 +85,71 @@ const Profile = () => {
 
 
   return (
-    <View style={{
-      flex: 1,
-      backgroundColor: "white",
-      padding: 18,
-      alignItems: 'center',
-    }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white", padding: 18, alignItems: 'center'}}>
+      <View style={{ borderWidth: 3, borderColor: "#557C55", padding: 5, borderRadius: 100, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65, elevation: 6 }}>
+        <Image source={{ uri: image || users.image }} style={{ width: 100, height: 100, borderRadius: 200 }}/>
+        <Pressable onPress={handleImageUpload} style={{ position: "absolute", bottom: 0, right: -5, backgroundColor: "gray", borderRadius: 100, width: 35, height: 35, alignItems: "center", justifyContent: "center" }}>
+          <Ionicons name="ios-camera" size={24} color="white" />
+        </Pressable>
+      </View>
 
-      <Avatar
-        rounded
-        source={{ uri: image || users.image }}  // Use the 'image' state as the source
-        size="large"
-      />
-      <Pressable onPress={handleImageUpload}>
-        <Text>Upload Image</Text>
-      </Pressable>
-      <Text>{users.name}</Text>
-      {/* Các tab chuyển sang các stack khác */}
-      <Pressable
-        onPress={() => navigation.navigate("Setting")}
-        style={buttonStyle}
-      >
+      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
+        <Text style={{ fontSize: 25, fontWeight: "bold" }}>{users.name}</Text>
+        <Feather name="edit-3" size={20} color="gray" />
+      </View>
+
+      <Text style={{ fontSize: 16, color: "gray" }}>{users.email}</Text>
+      <View style={{ marginTop: 40, width: "100%" }}>
+        <Pressable style={[profileCard, {borderTopLeftRadius: 10, borderTopRightRadius: 10, marginBottom: 5}]}>
+          <MaterialCommunityIcons name="qrcode-scan" size={24} color="black" />
+          <Text style={profileCardText}>Scan QR Code</Text>
+        </Pressable>
+
+        <Pressable style={[profileCard, { marginBottom: 5 }]}>
+          <Ionicons name="qr-code-outline" size={24} color="black" />
+          <Text style={profileCardText}>My QR Code</Text>
+        </Pressable>
+
+        <Pressable style={profileCard}>
+          <Octicons name="person" size={24} color="black" />
+          <Text style={profileCardText}>Change Personal Information</Text>
+        </Pressable>
+
+        <Pressable style={[profileCard, { borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginTop: 5 }]}>
+          <Feather name="lock" size={24} color="black" />
+          <Text style={profileCardText}>Change Password</Text>
+        </Pressable>
+      </View>
+
+      {/* <Pressable onPress={() => navigation.navigate("Setting")} style={buttonStyle}>
         <Text style={buttonTextStyle}>Setting</Text>
       </Pressable>
-      <Pressable
-        onPress={() => navigation.navigate("ChangePassword")}
-        style={buttonStyle}
-      >
+
+      <Pressable onPress={() => navigation.navigate("ChangePassword")} style={buttonStyle}>
         <Text style={buttonTextStyle}>Change Password</Text>
       </Pressable>
-      <Pressable
-        onPress={() => navigation.navigate("ChangeInformation")}
-        style={buttonStyle}
-      >
+
+      <Pressable onPress={() => navigation.navigate("ChangeInformation")} style={buttonStyle} >
         <Text style={buttonTextStyle}>Change Information</Text>
-      </Pressable>
-      <Pressable
-        onPress={() => {
-          setUserId(null);
-          navigation.navigate("Login");
-        }}
-        style={buttonStyle}
-      >
+      </Pressable> */}
+
+      <Pressable onPress={() => { setUserId(null); navigation.navigate("Login"); }} style={buttonStyle}>
         <Text style={buttonTextStyle}>Log Out</Text>
+        <Ionicons name="ios-log-out-outline" size={24} color="#fff" />
       </Pressable>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const buttonStyle = {
-  width: 350,
-  backgroundColor: "#4A55A2",
+  backgroundColor: "#FF6D60",
   padding: 15,
   marginTop: 20,
-  borderRadius: 10,
+  borderRadius: 50,
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: 15
 };
 
 const buttonTextStyle = {
@@ -144,5 +158,20 @@ const buttonTextStyle = {
   fontWeight: "bold",
   textAlign: "center",
 };
+
+const profileCard = {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  padding: 15,
+  backgroundColor: "#D1E8E4",
+  gap: 15,
+}
+
+const profileCardText = {
+  fontSize: 16,
+  fontWeight: 500,
+  color: "black",
+}
 
 export default Profile;
