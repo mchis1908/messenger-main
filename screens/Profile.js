@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Pressable, Alert, Image } from 'react-native'; // Import thêm Image
+import React, { useEffect, useState, useContext, useRef } from 'react';
+import { View, Text, Pressable, Alert, Image, TextInput } from 'react-native'; // Import thêm Image
 import { useNavigation } from '@react-navigation/core';
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,12 +14,16 @@ import { doc, updateDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather, MaterialCommunityIcons, Octicons } from '@expo/vector-icons'; 
+import QRCodeModal from '../components/qrCodeModal';
+import { Modalize } from 'react-native-modalize';
 
 const Profile = () => {
   const navigation = useNavigation();
   const [users, setUsers] = useState({});
   const { userId, setUserId } = useContext(UserType);
   const [image, setImage] = useState(null);
+  const [isShowQrModal, setIsShowQrModal] = useState(false);
+  const modalInformation = useRef();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -55,17 +59,12 @@ const Profile = () => {
       try {
         const response = await fetch(result.assets[0].uri);
         const blob = await response.blob();
-
-
-        // Upload the image to Firebase Storage
         const uploadTask = uploadBytes(storageRef, blob);
 
         await uploadTask;
 
-        // Get the download URL for the uploaded image
         const url = await getDownloadURL(storageRef);
 
-        // Update the user's profile image URL in Firestore
         const userDocRef = doc(db, "users", userId);
         const updateData = {
           image: url,
@@ -73,7 +72,6 @@ const Profile = () => {
 
         await updateDoc(userDocRef, updateData);
 
-        // Update the state with the new image URL to trigger a re-render
         setImage(url);
       } catch (error) {
         console.error("Error during image upload:", error);
@@ -81,62 +79,71 @@ const Profile = () => {
     }
   };
   
+  const handleOpenQrModal = () => {
+	setIsShowQrModal(true);
+  }
 
+  const handleCloseQrModal = () => {
+	setIsShowQrModal(false);
+  }
 
+  const onPressPersonalInformation = () => {
+    modalInformation.current?.open();
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white", padding: 18, alignItems: 'center'}}>
-      <View style={{ borderWidth: 3, borderColor: "#557C55", padding: 5, borderRadius: 100, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65, elevation: 6 }}>
-        <Image source={{ uri: image || users.image }} style={{ width: 100, height: 100, borderRadius: 200 }}/>
-        <Pressable onPress={handleImageUpload} style={{ position: "absolute", bottom: 0, right: -5, backgroundColor: "gray", borderRadius: 100, width: 35, height: 35, alignItems: "center", justifyContent: "center" }}>
-          <Ionicons name="ios-camera" size={24} color="white" />
-        </Pressable>
-      </View>
+		<View style={{ borderWidth: 3, borderColor: "#557C55", padding: 5, borderRadius: 100, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65, elevation: 6 }}>
+			<Image source={{ uri: image || users.image }} style={{ width: 100, height: 100, borderRadius: 200 }}/>
+			<Pressable onPress={handleImageUpload} style={{ position: "absolute", bottom: 0, right: -5, backgroundColor: "gray", borderRadius: 100, width: 35, height: 35, alignItems: "center", justifyContent: "center" }}>
+				<Ionicons name="ios-camera" size={24} color="white" />
+			</Pressable>
+		</View>
 
-      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
-        <Text style={{ fontSize: 25, fontWeight: "bold" }}>{users.name}</Text>
-        <Feather name="edit-3" size={20} color="gray" />
-      </View>
+		<View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
+			<Text style={{ fontSize: 25, fontWeight: "bold" }}>{users.name}</Text>
+			<Feather name="edit-3" size={20} color="gray" />
+		</View>
 
-      <Text style={{ fontSize: 16, color: "gray" }}>{users.email}</Text>
-      <View style={{ marginTop: 40, width: "100%" }}>
-        <Pressable style={[profileCard, {borderTopLeftRadius: 10, borderTopRightRadius: 10, marginBottom: 5}]}>
-          <MaterialCommunityIcons name="qrcode-scan" size={24} color="black" />
-          <Text style={profileCardText}>Scan QR Code</Text>
-        </Pressable>
+		<Text style={{ fontSize: 16, color: "gray" }}>{users.email}</Text>
+		<View style={[{ marginTop: 40, width: "100%", alignItems: "center" }, boxShadow]}>
+			<Pressable onPress={handleOpenQrModal} style={[profileCard, {borderTopLeftRadius: 10, borderTopRightRadius: 10, marginBottom: 5}]}>
+				<Ionicons name="qr-code-outline" size={24} color="black" />
+				<Text style={profileCardText}>My QR Code</Text>
+			</Pressable>
 
-        <Pressable style={[profileCard, { marginBottom: 5 }]}>
-          <Ionicons name="qr-code-outline" size={24} color="black" />
-          <Text style={profileCardText}>My QR Code</Text>
-        </Pressable>
+			<View style={hrTag}></View>
 
-        <Pressable style={profileCard}>
-          <Octicons name="person" size={24} color="black" />
-          <Text style={profileCardText}>Change Personal Information</Text>
-        </Pressable>
+			<Pressable onPress={onPressPersonalInformation} style={profileCard}>
+				<Octicons name="person" size={24} color="black" />
+				<Text style={profileCardText}>Personal Information</Text>
+			</Pressable>
 
-        <Pressable style={[profileCard, { borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginTop: 5 }]}>
-          <Feather name="lock" size={24} color="black" />
-          <Text style={profileCardText}>Change Password</Text>
-        </Pressable>
-      </View>
+			<View style={hrTag}></View>
 
-      {/* <Pressable onPress={() => navigation.navigate("Setting")} style={buttonStyle}>
-        <Text style={buttonTextStyle}>Setting</Text>
-      </Pressable>
+			<Pressable style={[profileCard, { borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginTop: 5 }]}>
+				<Feather name="lock" size={24} color="black" />
+				<Text style={profileCardText}>Change Password</Text>
+			</Pressable>
+		</View>
 
-      <Pressable onPress={() => navigation.navigate("ChangePassword")} style={buttonStyle}>
-        <Text style={buttonTextStyle}>Change Password</Text>
-      </Pressable>
+		<Pressable onPress={() => { setUserId(null); navigation.navigate("Login"); }} style={buttonStyle}>
+			<Text style={buttonTextStyle}>Log Out</Text>
+			<Ionicons name="ios-log-out-outline" size={24} color="#fff" />
+		</Pressable>
 
-      <Pressable onPress={() => navigation.navigate("ChangeInformation")} style={buttonStyle} >
-        <Text style={buttonTextStyle}>Change Information</Text>
-      </Pressable> */}
+		<QRCodeModal isVisible={isShowQrModal} userData={users} onClose={handleCloseQrModal}/>
 
-      <Pressable onPress={() => { setUserId(null); navigation.navigate("Login"); }} style={buttonStyle}>
-        <Text style={buttonTextStyle}>Log Out</Text>
-        <Ionicons name="ios-log-out-outline" size={24} color="#fff" />
-      </Pressable>
+        <Modalize ref={modalInformation} modalTopOffset={500}>
+            <View style={inputGroup}>
+                <Text style={labelInformation}>Display name</Text>
+                <TextInput style={inputInformation} defaultValue={users.name}/>
+            </View>
+
+            <Pressable style={{ justifyContent: "center", alignItems: "center" }}>
+                <Text style={{ color: "black", fontSize: 16, fontWeight: "bold", marginTop: 20, width: "70%", textAlign: "center", backgroundColor: "#A6CF98", paddingVertical: 10 }}>Save</Text>
+            </Pressable>
+        </Modalize>
     </SafeAreaView>
   )
 }
@@ -164,14 +171,60 @@ const profileCard = {
   alignItems: "center",
   justifyContent: "flex-start",
   padding: 15,
-  backgroundColor: "#D1E8E4",
   gap: 15,
+  width: "100%"
 }
 
 const profileCardText = {
   fontSize: 16,
   fontWeight: 500,
   color: "black",
+}
+
+const boxShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  shadowOpacity: 0.27,
+  shadowRadius: 4.65,
+
+  elevation: 6,
+}
+
+const hrTag = {
+  width: "85%",
+  height: 1,
+  backgroundColor: "gray"
+}
+
+const inputGroup = {
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 10,
+    flexDirection: "row"
+}
+
+const inputInformation = {
+    width: "70%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingLeft: 10,
+    paddingRight: 10
+}
+
+const labelInformation = {
+    width: "30%",
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "black"
 }
 
 export default Profile;

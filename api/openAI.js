@@ -14,23 +14,23 @@ export const apiCall = async (prompt, messages)=>{
     
     // // Logic 1 : this will check the prompt from chatgpt if user wants to create an image
     try{
-        const res = await client.post(chatgptUrl, {
-            model: "gpt-3.5-turbo",
-            messages: [{
-                role: 'user',
-                content: `Is the ${prompt} about creating a picture, image, or any visual art? Please respond with either 'Yes' or 'No'`
-            }]
-        });
-        console.log(res);
-        isArt = res.data?.choices[0]?.message?.content;
-        isArt = isArt.trim();
-        if(isArt.toLowerCase().includes('yes')){
-            console.log('dalle api call');
-            return dalleApiCall(prompt, messages)
-        }else{
+        // const res = await client.post(chatgptUrl, {
+        //     model: "gpt-3.5-turbo",
+        //     messages: [{
+        //         role: 'user',
+        //         content: `Is the ${prompt} about creating a picture, image, or any visual art? Please respond with either 'Yes' or 'No'`
+        //     }]
+        // });
+        // console.log(res);
+        // isArt = res.data?.choices[0]?.message?.content;
+        // isArt = isArt.trim();
+        // if(isArt.toLowerCase().includes('yes')){
+        //     console.log('dalle api call');
+        //     return dalleApiCall(prompt, messages)
+        // }else{
             console.log('chatgpt api call')
             return chatgptApiCall(prompt, messages);
-        }
+        // }
 
     }catch(err){
         console.log('error: ',err);
