@@ -32,31 +32,31 @@ const SocialPost = ({ postData }) => {
         const storedUserId = await AsyncStorage.getItem("userId");
         setIsLiked(!isLiked);
         if (!isLiked) {
-            // // await push(RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}/interactions/likes`), {anc: 123});
-            // const interactionsRef = RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}/interactions/likes`);
-            // const likeRef = push(interactionsRef);
-            // set(likeRef, {
-            //     id: userData.id,
-            //     name: userData.name,
-            // });
             const interactionsRef = RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}`);
-            runTransaction(interactionsRef, (interactions) => {
-                console.log("interactions", interactions)
+            await runTransaction(interactionsRef, (interactions) => {
                 if (interactions) {
                     if (interactions.likes) {
-                        if (!isLiked) {
-                            interactions.likes[storedUserId] = {
-                                id: userData.id,
-                                name: userData.name,
-                            }
-                        } else {
-                            delete interactions.likes[storedUserId];
-                        }
-                }}
+                        interactions.likes.push({
+                            [storedUserId]: userData.name,
+                        });
+                    } else {
+                        interactions.likes = [{
+                            [storedUserId]: userData.name,
+                        }];
+                    }
+                }
                 return interactions;
             });
         } else {
-            
+            const interactionsRef = RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}/likes`);
+            await runTransaction(interactionsRef, (interactions) => {
+                console.log("interactions", interactions)
+                if (interactions) {
+                    const index = interactions.findIndex((like) => like[storedUserId]);
+                    interactions.splice(index, 1);
+                }
+                return interactions;
+            });
         }
     }
 
@@ -145,7 +145,7 @@ const SocialPost = ({ postData }) => {
                             </TouchableOpacity>
                         )
                     }
-                    <Text>23</Text>
+                    <Text>{ postData.likes ? postData.likes.length : 0 }</Text>
                 </View>
 
                 <View style={{ flexDirection: "column", justifyContent: "space-betwwen", alignItems: "center", height: "100%", marginTop: 5 }}>

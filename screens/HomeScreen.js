@@ -64,7 +64,7 @@ const HomeScreen = () => {
                 id: postId,
                 ...data[postId],
               }));
-              setAllPosts(postsWithId);
+              setAllPosts(postsWithId.reverse());
               console.log("data all posts", postsWithId);
             } else {
               setAllPosts([]);
