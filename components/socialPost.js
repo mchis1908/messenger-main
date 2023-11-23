@@ -28,37 +28,41 @@ const SocialPost = ({ postData }) => {
       }, []);
 
 
-    const handleLike = async () => {
-        const storedUserId = await AsyncStorage.getItem("userId");
-        setIsLiked(!isLiked);
-        if (!isLiked) {
+      const handleLike = async () => {
+        try {
+            const storedUserId = await AsyncStorage.getItem("userId");
+            setIsLiked(!isLiked);
+    
             const interactionsRef = RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}`);
             await runTransaction(interactionsRef, (interactions) => {
-                if (interactions) {
-                    if (interactions.likes) {
-                        interactions.likes.push({
-                            [storedUserId]: userData.name,
-                        });
-                    } else {
-                        interactions.likes = [{
-                            [storedUserId]: userData.name,
-                        }];
+                if (!interactions) {
+                    interactions = {};
+                }
+    
+                if (!interactions.likes) {
+                    interactions.likes = [];
+                }
+    
+                const userLikedIndex = interactions.likes.findIndex((like) => like[storedUserId]);
+    
+                if (!isLiked) {
+                    if (userLikedIndex === -1) {
+                        interactions.likes.push({ [storedUserId]: userData.name });
+                    }
+                } else {
+                    if (userLikedIndex !== -1) {
+                        interactions.likes.splice(userLikedIndex, 1);
                     }
                 }
+    
                 return interactions;
             });
-        } else {
-            const interactionsRef = RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}/likes`);
-            await runTransaction(interactionsRef, (interactions) => {
-                console.log("interactions", interactions)
-                if (interactions) {
-                    const index = interactions.findIndex((like) => like[storedUserId]);
-                    interactions.splice(index, 1);
-                }
-                return interactions;
-            });
+    
+        } catch (error) {
+            console.error("Error handling like:", error);
         }
-    }
+    };
+    
 
     function timeAgo(timestamp) {
         const seconds = Math.floor((new Date() - timestamp) / 1000);
