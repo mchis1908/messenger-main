@@ -1,12 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { ref, update, onValue } from 'firebase/database';
+import { ref as RealtimeRef, push, onValue, set, query, equalTo, runTransaction } from "firebase/database";
+import { REAL_TIME_DATABASE } from "../FirebaseConfig";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { EXPO_PUBLIC_URL } from '@env';
 
 const SocialPost = ({ postData }) => {
     const [isLiked, setIsLiked] = useState(false);
-    const handleLike = () => {
+    const [userData, setUserData] = useState({});
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const storedUserId = await AsyncStorage.getItem("userId");
+            console.log("storedUserId", storedUserId)
+            const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
+            console.log("response", response)
+            setUserData(response.data);
+            console.log("userData", userData)
+          } catch (error) {
+            console.log("Error:", error);
+          }
+        };
+        fetchUserData();
+      }, []);
+
+
+    const handleLike = async () => {
+        const storedUserId = await AsyncStorage.getItem("userId");
         setIsLiked(!isLiked);
+        if (!isLiked) {
+            // // await push(RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}/interactions/likes`), {anc: 123});
+            // const interactionsRef = RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}/interactions/likes`);
+            // const likeRef = push(interactionsRef);
+            // set(likeRef, {
+            //     id: userData.id,
+            //     name: userData.name,
+            // });
+            const interactionsRef = RealtimeRef(REAL_TIME_DATABASE, `posts/${postData.id}`);
+            runTransaction(interactionsRef, (interactions) => {
+                console.log("interactions", interactions)
+                if (interactions) {
+                    if (interactions.likes) {
+                        if (!isLiked) {
+                            interactions.likes[storedUserId] = {
+                                id: userData.id,
+                                name: userData.name,
+                            }
+                        } else {
+                            delete interactions.likes[storedUserId];
+                        }
+                }}
+                return interactions;
+            });
+        } else {
+            
+        }
     }
 
     function timeAgo(timestamp) {
@@ -69,8 +120,16 @@ const SocialPost = ({ postData }) => {
             </View>
 
             <View style={styles.postContent}>
-                <Image source={{ uri: postData.imageURL }} style={{ width: '100%', height: 200, borderRadius: 16 }} />
-                <Text style={styles.postCaption}>{ postData.caption }</Text>
+                {
+                    postData.image && (
+                        <Image source={{ uri: postData.imageURL }} style={{ width: '100%', height: 200, borderRadius: 16 }} />
+                    )
+                }
+                {
+                    postData.caption && (
+                        <Text style={styles.postCaption}>{ postData.caption }</Text>
+                    )
+                }
             </View>
 
             <View style={styles.postFooter}>

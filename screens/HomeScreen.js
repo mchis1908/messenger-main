@@ -91,8 +91,8 @@ const HomeScreen = () => {
                 authorName: userData.name,
                 authorImage: userData.image,
                 interactions: {
-                    likes: [],
-                    comments: [],
+                    likes: {},
+                    comments: {},
                 }
             };
     
