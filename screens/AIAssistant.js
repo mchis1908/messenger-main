@@ -1,23 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  View,
-  Pressable,
-  TextInput,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Pressable, TextInput, Text, SafeAreaView, TouchableOpacity, Image, ScrollView, Alert} from 'react-native';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { apiCall } from '../api/openAI';
-import Features from '../components/features';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 
 const App = () => {
   const [result, setResult] = useState('');
+  const [feature, setFeature] = useState('gpt');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const scrollViewRef = useRef();
@@ -31,7 +20,7 @@ const App = () => {
 
       updateScrollView();
 
-      apiCall(result.trim(), newMessages).then(res=>{
+      apiCall(result.trim(), newMessages, feature).then(res=>{
         console.log('got api data');
         setLoading(false);
         console.log(res)
@@ -39,8 +28,6 @@ const App = () => {
           setMessages([...res.data]);
           setResult('');
           updateScrollView();
-          // now play the response to user
-          startTextToSpeach(res.data[res.data.length-1]);
         }else{
           Alert.alert('Error', res.msg);
         }
@@ -56,8 +43,9 @@ const App = () => {
 
   return (
     <SafeAreaView style={{flexDirection: 'column', flex:1, backgroundColor:'#fff'}}>
-      <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical:30 }}>
-        <Image source={require('../assets/images/bot.png')} style={{ height: hp(15), width: hp(15) }} />
+      <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems:'center', marginVertical:30 }}>
+      <Image source={feature === 'gpt' ? require('../assets/images/bot.png') : require('../assets/images/dalle.png')} style={{ height: hp(10), width: hp(10) }} />
+        <Text style={{ color: feature === 'gpt' ? '#6EE7C8' : '#9E6BFF', fontSize: wp(6), fontWeight: 'bold' }}>{feature==='gpt' ? 'ChatGPT Bot': 'Dall-E Bot'}</Text>
       </View>
 
       {messages.length > 0 ? (
@@ -68,15 +56,13 @@ const App = () => {
             if (message.role === 'assistant') {
               if (message.content.includes('https')) {
                 return (
-                <View key={index} style={{ flexDirection: 'row', justifyContent: 'flex-start', marginBottom:16 }}>
-                  <View style={{ padding: 8, flex: 1, borderRadius: 16, backgroundColor: '#81e6ad', borderTopRightRadius: 0 }}>
+                  <View key={index} style={{ width: wp(70), backgroundColor: '#fff', padding: 8, borderRadius: 16, borderTopLeftRadius: 0, marginBottom:16 }}>
                     <Image source={{ uri: message.content }} style={{ height: wp(50), width: wp(50), borderRadius: 16 }} />
                   </View>
-                </View>
                 );
               } else {
                 return (
-                <View key={index} style={{ width: wp(70), backgroundColor: '#81e6ad', padding: 8, borderRadius: 16, borderTopRightRadius: 0, marginBottom:16 }}>
+                <View key={index} style={{ width: wp(70), backgroundColor: '#fff', padding: 8, borderRadius: 16, borderTopLeftRadius: 0, marginBottom:16 }}>
                   <Text style={{ color: '#444', fontSize: wp(4) }}>{message.content}</Text>
                 </View>
                 );
@@ -84,7 +70,7 @@ const App = () => {
             } else {
               return (
               <View key={index} style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom:16 }}>
-                <View style={{ width: wp(70), backgroundColor: 'white', padding: 8, borderRadius: 16, borderTopLeftRadius: 0 }}>
+                <View style={{ width: wp(70), backgroundColor: '#DCF8C6', padding: 8, borderRadius: 16, borderBottomRightRadius: 0 }}>
                   <Text style={{ fontSize: wp(4) }}>{message.content}</Text>
                 </View>
               </View>
@@ -95,7 +81,31 @@ const App = () => {
         </View>
       </View>
       ) : (
-      <Features />
+        <ScrollView style={{minHeight: hp(50), bounces: false, showsVerticalScrollIndicator: false , paddingHorizontal:12}}>
+          <Text style={{ fontSize: wp(6.5), fontWeight: 'bold', color: '#333' }}>Features</Text>
+
+          <Pressable style={{ backgroundColor: '#6EE7C8', padding: hp(1), borderRadius: 10, marginVertical: hp(1) }} onPress={() => { setFeature('gpt')}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp(1) }}>
+            <Image source={require('../assets/images/chatgptIcon.png')} style={{ height: hp(4), width: hp(4), borderRadius: hp(2) }} />
+            <Text style={{ fontSize: wp(4.8), fontWeight: 'bold', color: '#333', marginLeft: wp(2) }}>ChatGPT</Text>
+            </View>
+
+            <Text style={{ fontSize: wp(3.8), fontWeight: 'medium', color: '#333' }}>
+            ChatGPT can provide you with instant and knowledgeable responses, assist you with creative ideas on a wide range of topics.
+            </Text>
+          </Pressable>
+
+          <Pressable style={{ backgroundColor: '#9E6BFF', padding: hp(1), borderRadius: 10, marginVertical: hp(1) }} onPress={() => { setFeature('dalle')}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp(1) }}>
+            <Image source={require('../assets/images/dalleIcon.png')} style={{ height: hp(4), width: hp(4), borderRadius: hp(2) }} />
+            <Text style={{ fontSize: wp(4.8), fontWeight: 'bold', color: '#333', marginLeft: wp(2) }}>DALL-E</Text>
+            </View>
+
+            <Text style={{ fontSize: wp(3.8), fontWeight: 'medium', color: '#333' }}>
+            DALL-E can generate imaginative and diverse images from textual descriptions, expanding the boundaries of visual creativity.
+            </Text>
+          </Pressable>
+        </ScrollView>
       )}
 
       <View style={{
