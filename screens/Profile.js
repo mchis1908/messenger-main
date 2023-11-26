@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import { View, Text, Pressable, Alert, Image, TextInput } from 'react-native'; // Import thêm Image
+import { View, Text, Pressable, Alert, Image, TextInput, TouchableOpacity } from 'react-native'; // Import thêm Image
 import { useNavigation } from '@react-navigation/core';
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -8,7 +8,7 @@ import axios from "axios";
 import { Avatar } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { FIREBASE_APP } from '../FirebaseConfig';
+import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_FIRESTORE } from '../FirebaseConfig';
 import * as FileSystem from 'expo-file-system';
 import { doc, updateDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather, MaterialCommunityIcons, Octicons } from '@expo/vector-icons'; 
 import QRCodeModal from '../components/qrCodeModal';
 import { Modalize } from 'react-native-modalize';
+import { updatePassword } from 'firebase/auth';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -24,6 +25,9 @@ const Profile = () => {
   const [image, setImage] = useState(null);
   const [isShowQrModal, setIsShowQrModal] = useState(false);
   const modalInformation = useRef();
+  const modalPassword = useRef()
+  const [editInformation, setEditInformation] = useState('');
+  const [editPassword, setEditPassword] = useState('');
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -31,9 +35,10 @@ const Profile = () => {
         const storedUserId = await AsyncStorage.getItem("userId");
         setUserId(storedUserId);
 
-        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
+        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${userId}`);
         setUsers(response.data);
         console.log("userData", users)
+        setEditInformation(response.data.name);
       } catch (error) {
         console.log("Error:", error);
       }
@@ -91,6 +96,35 @@ const Profile = () => {
     modalInformation.current?.open();
   }
 
+  const onPressChangePassword = () => {
+    modalPassword.current?.open();
+  }
+
+  const handleUpdateInformation = async () => {
+    const storedUserId = await AsyncStorage.getItem("userId");
+    const userRef = doc(FIREBASE_FIRESTORE, "users", storedUserId);
+    await updateDoc(userRef, {
+        name: editInformation
+    }).then(() => {
+        setUsers({
+            ...users,
+            name: editInformation
+        })
+        modalInformation.current?.close();
+    })
+  }
+
+  const handleUpdatePassword = async () => {
+    const user = FIREBASE_AUTH.currentUser;
+    updatePassword(user, editPassword).then(() => {
+        alert("Password updated successfully")
+        modalPassword.current?.close();
+    }).catch((error) => {
+        console.log("error", error)
+        alert(error.message)
+    })
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white", padding: 18, alignItems: 'center'}}>
 		<View style={{ borderWidth: 3, borderColor: "#557C55", padding: 5, borderRadius: 100, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65, elevation: 6 }}>
@@ -121,7 +155,7 @@ const Profile = () => {
 
 			<View style={hrTag}></View>
 
-			<Pressable style={[profileCard, { borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginTop: 5 }]}>
+			<Pressable onPress={onPressChangePassword} style={[profileCard, { borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginTop: 5 }]}>
 				<Feather name="lock" size={24} color="black" />
 				<Text style={profileCardText}>Change Password</Text>
 			</Pressable>
@@ -132,17 +166,28 @@ const Profile = () => {
 			<Ionicons name="ios-log-out-outline" size={24} color="#fff" />
 		</Pressable>
 
-		<QRCodeModal isVisible={isShowQrModal} userData={users} onClose={handleCloseQrModal}/>
+		<QRCodeModal isVisible={isShowQrModal} userData={{ id: userId }} onClose={handleCloseQrModal}/>
 
         <Modalize ref={modalInformation} modalTopOffset={500}>
             <View style={inputGroup}>
                 <Text style={labelInformation}>Display name</Text>
-                <TextInput style={inputInformation} defaultValue={users.name}/>
+                <TextInput onChangeText={(value) => setEditInformation(value)} style={inputInformation} defaultValue={users.name} value={editInformation}/>
             </View>
 
-            <Pressable style={{ justifyContent: "center", alignItems: "center" }}>
+            <TouchableOpacity onPress={handleUpdateInformation} style={{ justifyContent: "center", alignItems: "center" }}>
                 <Text style={{ color: "black", fontSize: 16, fontWeight: "bold", marginTop: 20, width: "70%", textAlign: "center", backgroundColor: "#A6CF98", paddingVertical: 10 }}>Save</Text>
-            </Pressable>
+            </TouchableOpacity>
+        </Modalize>
+
+        <Modalize ref={modalPassword} modalTopOffset={500}>
+            <View style={inputGroup}>
+                <Text style={labelInformation}>New Password</Text>
+                <TextInput secureTextEntry={true} onChangeText={(value) => setEditPassword(value)} style={inputInformation} value={editPassword} placeholder='Enter new password'/>
+            </View>
+
+            <TouchableOpacity onPress={handleUpdatePassword} style={{ justifyContent: "center", alignItems: "center" }}>
+                <Text style={{ color: "black", fontSize: 16, fontWeight: "bold", marginTop: 20, width: "70%", textAlign: "center", backgroundColor: "#A6CF98", paddingVertical: 10 }}>Save</Text>
+            </TouchableOpacity>
         </Modalize>
     </SafeAreaView>
   )

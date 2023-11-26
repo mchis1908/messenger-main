@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import Modal from 'react-native-modal';
 import QRCode from 'react-native-qrcode-svg';
 import { Ionicons } from '@expo/vector-icons'; 
+import { UserType } from '../UserContext';
 
 const QRCodeModal = ({ userData, isVisible, onClose }) => {
+    const { userId } = useContext(UserType);
 	const handleCloseModal = () => {
 		onClose();
 	};
@@ -12,12 +14,7 @@ const QRCodeModal = ({ userData, isVisible, onClose }) => {
     return (
         <Modal isVisible={isVisible}>
 			<View style={styles.modalContainer}>
-				<QRCode value={JSON.stringify({
-					id: userData.id,
-					name: userData.name,
-					email: userData.email,
-					image: userData.image
-				})} size={250}/>
+				<QRCode value={userId} size={250}/>
 				<Pressable onPress={handleCloseModal} style={styles.closeStyle}>
 					<Ionicons name="ios-close" size={24} color="#FF6D60" />
 					<Text style={styles.textStyle}>Close</Text>
@@ -49,7 +46,7 @@ const QRCodeModal = ({ userData, isVisible, onClose }) => {
 		marginTop: 20,
 		gap: 10,
 		paddingHorizontal: 10,
-		borderRadius: 10,
+		borderRadius: 24,
 		shadowColor: "#000",
 		shadowOffset: {
 			width: 0,
@@ -59,6 +56,8 @@ const QRCodeModal = ({ userData, isVisible, onClose }) => {
 		shadowRadius: 16.00,
 
 		elevation: 24,
+        borderWidth: 1,
+        borderColor: "#FF6D60"
 	  }
     });
 

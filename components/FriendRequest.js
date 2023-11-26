@@ -19,19 +19,6 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
 
   const acceptRequest = async (friendRequestId) => {
     try {
-      // const response = await fetch(
-      //   `${EXPO_PUBLIC_URL}/user/friend-request/accept`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       senderId: friendRequestId,
-      //       recepientId: userId,
-      //     }),
-      //   }
-      // );
       const response = await axios.post(`${EXPO_PUBLIC_URL}/user/friend-request/accept`, {
         "senderId": friendRequestId,
         "recipientId": userId

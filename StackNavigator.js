@@ -8,6 +8,7 @@ import ForgotPass from "./screens/ForgotPass";
 import AIAssistant from "./screens/AIAssistant";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
 import MainScreen from "./MainScreen";
+import DetailPost from "./screens/DetailPost";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -20,6 +21,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Messages" component={ChatMessagesScreen}/>
         <Stack.Screen name="AIAssistant" component={AIAssistant} />
         <Stack.Screen name="ForgotPass" component={ForgotPass}/>
+        <Stack.Screen name="DetailPost" component={DetailPost} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

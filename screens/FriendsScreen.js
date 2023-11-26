@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import User from "../components/User";
+import { BarCodeScanner } from "expo-barcode-scanner";
 
 const FriendsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
@@ -16,6 +17,15 @@ const FriendsScreen = () => {
   const [originalUserList, setOriginalUserList] = useState([]); 
   const [openQrCodeScanner, setOpenQrCodeScanner] = useState(false);
   const [friendData, setFriendData] = useState(null);
+  const [friendId, setFriendId] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
   
   useEffect(() => {
     const fetchUserId = async () => {
@@ -55,11 +65,29 @@ const FriendsScreen = () => {
     }
   }
 
-  const handleBarCodeScanned = ({ data }) => {
-    setFriendData(JSON.parse(data));
+  const handleBarCodeScanned = ({ type, data }) => {
+    console.log("aaaaaa", data.id)
+    setFriendId(data);
     setOpenQrCodeScanner(false);
-    console.log("friendData", friendData)
+    console.log("friendData", friendId)
   }
+
+  useEffect(() => {
+    const fetchFriendData = async () => {
+      try {
+        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${friendId}`);
+        if (response.status === 200) {
+          setFriendData(response.data);
+          console.log("friendData", friendData)
+        }
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+    if (friendId) {
+      fetchFriendData();
+    }
+  }, [friendId])
 
   function activateScanner() {
     setOpenQrCodeScanner(true)
