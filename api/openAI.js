@@ -10,45 +10,40 @@ const client = axios.create({
 const chatgptUrl = 'https://api.openai.com/v1/chat/completions';
 const dalleUrl = 'https://api.openai.com/v1/images/generations';
 
-export const apiCall = async (prompt, messages)=>{
-    
-    // // Logic 1 : this will check the prompt from chatgpt if user wants to create an image
-    try{
-        // const res = await client.post(chatgptUrl, {
-        //     model: "gpt-3.5-turbo",
-        //     messages: [{
-        //         role: 'user',
-        //         content: `Is the ${prompt} about creating a picture, image, or any visual art? Please respond with either 'Yes' or 'No'`
-        //     }]
-        // });
-        // console.log(res);
-        // isArt = res.data?.choices[0]?.message?.content;
-        // isArt = isArt.trim();
-        // if(isArt.toLowerCase().includes('yes')){
-        //     console.log('dalle api call');
-        //     return dalleApiCall(prompt, messages)
-        // }else{
-            console.log('chatgpt api call')
-            return chatgptApiCall(prompt, messages);
-        // }
+export const apiCall = async (prompt, messages, feature)=>{
+    // try{
+    //     const res = await client.post(chatgptUrl, {
+    //         model: "gpt-3.5-turbo",
+    //         messages: [{
+    //             role: 'user',
+    //             content: `Is the ${prompt} about creating a picture, image, or any visual art? Please respond with either 'Yes' or 'No'`
+    //         }]
+    //     });
+    //     console.log(res);
+    //     isArt = res.data?.choices[0]?.message?.content;
+    //     isArt = isArt.trim();
+    //     if(isArt.toLowerCase().includes('yes')){
+    //         console.log('dalle api call');
+    //         return dalleApiCall(prompt, messages)
+    //     }else{
+    //         console.log('chatgpt api call')
+    //         return chatgptApiCall(prompt, messages);
+    //     }
 
-    }catch(err){
-        console.log('error: ',err);
-        return Promise.resolve({success: false, msg: err.message});
+    // }catch(err){
+    //     console.log('error: ',err);
+    //     return Promise.resolve({success: false, msg: err.message});
+    // }
+
+    if(feature==='dalle'){
+        console.log('dalle api call');
+        return dalleApiCall(prompt, messages)
+    }else
+    {
+        console.log('chatgpt api call')
+        return chatgptApiCall(prompt, messages);
     }
 
-    // // Logic 2 : sometimes chatgpt does not understand the art messages but thats fine, you can use this approach :)
-
-    // prompt = prompt.toLowerCase();
-    // let isArt = prompt.includes('image') || prompt.includes('sketch') || prompt.includes('art') || prompt.includes('picture') || prompt.includes('drawing');
-    // if(isArt){
-    //     console.log('dalle api call');
-    //     return dalleApiCall(prompt, messages)
-    // }else{
-    //     console.log('chatgpt api call')
-    //     return chatgptApiCall(prompt, messages);
-    // }
-    
 }
 
 const chatgptApiCall = async (prompt, messages)=>{
