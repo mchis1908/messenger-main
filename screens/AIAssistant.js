@@ -19,14 +19,13 @@ const App = () => {
       setMessages([...newMessages]);
 
       updateScrollView();
-
+      setResult('');
       apiCall(result.trim(), newMessages, feature).then(res=>{
         console.log('got api data');
         setLoading(false);
         console.log(res)
         if(res.success){
           setMessages([...res.data]);
-          setResult('');
           updateScrollView();
         }else{
           Alert.alert('Error', res.msg);
