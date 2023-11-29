@@ -15,6 +15,15 @@ const ChatsScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    const fetchUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem("userId");
+      console.log("storedUserId", storedUserId)
+      setUserId(storedUserId);
+    };
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
     const getAllConversation = async () => {
       const response = await axios.get(`${EXPO_PUBLIC_URL}/conversation/${userId}`);
       console.log("response", response)
@@ -22,7 +31,9 @@ const ChatsScreen = () => {
       setOriginalAcceptedFriends(response.data.conversations);
       console.log("acceptedFriends", acceptedFriends)
     }
-    getAllConversation()
+    if (userId) {
+      getAllConversation()
+    }
   }, [userId])
 
   function handleSearch(value) {
@@ -44,9 +55,16 @@ const ChatsScreen = () => {
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Pressable>
-              {acceptedFriends.map((item,index) => (
+              {
+                acceptedFriends.length > 0 ? (
+                acceptedFriends.map((item,index) => (
                   <UserChat key={index} item={item}/>
-              ))}
+              ))
+              ) : (
+                <Text style={{ fontSize: 20, textAlign: "center" }}>
+                  No Chat Message!
+                </Text>
+              )}
           </Pressable>
         </ScrollView>
       </View>

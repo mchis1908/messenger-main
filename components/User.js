@@ -31,7 +31,7 @@ const User = ({ item }) => {
     if (userId) {
       fetchFriendRequests();
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const fetchUserFriends = async () => {
@@ -54,7 +54,7 @@ const User = ({ item }) => {
     if (userId) {
       fetchUserFriends();
     }
-  }, []);
+  }, [userId]);
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     try {
       // const response = await fetch(`${EXPO_PUBLIC_URL}/user/friend-request`, {

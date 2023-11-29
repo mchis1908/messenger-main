@@ -26,26 +26,15 @@ const FriendsScreen = () => {
       setHasPermission(status === 'granted');
     })();
   }, []);
-
-  useEffect(async () => {
-    const fetch = async () => {
-        const response = await axios.get(`https://talktime-api.onrender.com/user/all/6kWDQwGhB4WBAj4AhbcHNTQKvWV2`)
-        console.log("response", response)
-    }
-
-    fetch()
-  }, [])
   
   useEffect(() => {
     const fetchUserId = async () => {
-      const newUserId = await AsyncStorage.getItem("userId");
-      if (newUserId !== userId) {
-        setUserId(newUserId);
-        console.log(userId)
-      }
+      const storedUserId = await AsyncStorage.getItem("userId");
+      console.log("storedUserId", storedUserId)
+      setUserId(storedUserId);
     };
     fetchUserId();
-  }, [userId]);
+  }, []);
   
   useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +49,9 @@ const FriendsScreen = () => {
         console.log("Error:", error);
       }
     };
-    fetchData();
+    if (userId) {
+      fetchData();
+    }
   }, [userId]);
 
   function handleSearchFriends(value) {
@@ -127,7 +118,7 @@ const FriendsScreen = () => {
     if (userId) {
       fetchFriendRequests();
     }
-  }, []);
+  }, [userId]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -157,10 +148,12 @@ const FriendsScreen = () => {
       <View style={{ padding: 10, marginHorizontal: 12 }}>
         {
           friendRequests.length > 0 ? (
-            friendRequests.map((friendRequest) => (
+            friendRequests.map((item,index) => (
               <FriendRequest
-                key={friendRequest.id}
-                friendRequest={friendRequest}
+                key={index}
+                item={item}
+                friendRequests={friendRequests}
+                setFriendRequests={setFriendRequests}
               />
             ))
           ) : (

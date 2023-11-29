@@ -9,13 +9,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const { userId, setUserId } = useContext(UserType);
   const navigation = useNavigation();
-  // useEffect(() => {
-  //   const fetchUserId = async () => {
-  //     const userId = await AsyncStorage.getItem("userId");
-  //     await setUserId(userId);
-  //   };
-  //   fetchUserId();
-  // }, []);
 
   const acceptRequest = async (friendRequestId) => {
     try {
@@ -37,7 +30,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
         })
       }
     } catch (err) {
-      console.log("error acceptin the friend request", err);
+      console.log("error accept in the friend request", err);
     }
   };
   return (
@@ -51,7 +44,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
     >
       <Image
         style={{ width: 50, height: 50, borderRadius: 25 }}
-        source={{ uri: item.image }}
+        source={{ uri: item?.image }}
       />
 
       <Text
@@ -61,7 +54,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
       </Text>
 
       <Pressable
-        onPress={() => acceptRequest(item.id)}
+        onPress={() => acceptRequest(item?.id)}
         style={{ backgroundColor: "#0066b2", padding: 10, borderRadius: 6 }}
       >
         <Text style={{ textAlign: "center", color: "white" }}>Accept</Text>
