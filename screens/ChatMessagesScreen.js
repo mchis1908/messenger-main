@@ -93,7 +93,7 @@ const ChatMessagesScreen = () => {
         const response = await fetch(
           `${EXPO_PUBLIC_URL}/user/${recepientId}`
         );
-
+        console.log("response", response)
         const data = await response.json();
         setRecepientData(data);
         console.log("recepient data", recepientId)

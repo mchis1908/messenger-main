@@ -33,9 +33,11 @@ const Profile = () => {
     const fetchUsers = async () => {
       try {
         const storedUserId = await AsyncStorage.getItem("userId");
+        console.log("storedUserId", storedUserId)
         setUserId(storedUserId);
 
         const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${userId}`);
+        console.log("response", response)
         setUsers(response.data);
         console.log("userData", users)
         setEditInformation(response.data.name);

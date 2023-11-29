@@ -26,6 +26,15 @@ const FriendsScreen = () => {
       setHasPermission(status === 'granted');
     })();
   }, []);
+
+  useEffect(async () => {
+    const fetch = async () => {
+        const response = await axios.get(`https://talktime-api.onrender.com/user/all/6kWDQwGhB4WBAj4AhbcHNTQKvWV2`)
+        console.log("response", response)
+    }
+
+    fetch()
+  }, [])
   
   useEffect(() => {
     const fetchUserId = async () => {
@@ -95,6 +104,7 @@ const FriendsScreen = () => {
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
+        const userId = await AsyncStorage.getItem("userId");
       try {
         const response = await axios.get(
           `${EXPO_PUBLIC_URL}/user/friend-request/${userId}`

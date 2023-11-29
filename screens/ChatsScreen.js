@@ -17,6 +17,7 @@ const ChatsScreen = () => {
   useEffect(() => {
     const getAllConversation = async () => {
       const response = await axios.get(`${EXPO_PUBLIC_URL}/conversation/${userId}`);
+      console.log("response", response)
       setAcceptedFriends(response.data.conversations);
       setOriginalAcceptedFriends(response.data.conversations);
       console.log("acceptedFriends", acceptedFriends)
