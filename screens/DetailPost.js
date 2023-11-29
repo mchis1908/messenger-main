@@ -131,6 +131,7 @@ export default function DetailPost() {
     const handleOpenComment = () => {
         setIsOpenComment(!isOpenComment)
     }
+    console.log("userData", userData)
 
     return (
         <SafeAreaView>

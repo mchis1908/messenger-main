@@ -19,6 +19,7 @@ export default function CommentItem({ commentData }) {
         };
         fetchAuthorData();
     }, []);
+    console.log("authorData",authorData);
 
     return (
         <View style={styles.comment}>
