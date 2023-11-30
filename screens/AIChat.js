@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function AIChat() {
     const navigation = useNavigation();
   return (
-    <SafeAreaView style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-around', backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-around'}}>
         <View style={{ marginTop: 16 }}>
             <Text style={{ fontSize: wp(10), textAlign: 'center', fontWeight: 'bold', color: 'gray' }}>
                 Jarvis
