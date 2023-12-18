@@ -128,7 +128,7 @@ const Profile = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white", padding: 18, alignItems: 'center'}}>
+    <SafeAreaView style={{ flex: 1, padding: 18, alignItems: 'center'}}>
 		<View style={{ borderWidth: 3, borderColor: "#557C55", padding: 5, borderRadius: 100, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65, elevation: 6 }}>
 			<Image source={{ uri: image || users.image }} style={{ width: 100, height: 100, borderRadius: 200 }}/>
 			<Pressable onPress={handleImageUpload} style={{ position: "absolute", bottom: 0, right: -5, backgroundColor: "gray", borderRadius: 100, width: 35, height: 35, alignItems: "center", justifyContent: "center" }}>
