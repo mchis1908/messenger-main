@@ -19,6 +19,7 @@ const ChatsScreen = () => {
       const storedUserId = await AsyncStorage.getItem("userId");
       console.log("storedUserId", storedUserId)
       setUserId(storedUserId);
+      console.log("storedUserId", storedUserId)
     };
     fetchUserId();
   }, []);

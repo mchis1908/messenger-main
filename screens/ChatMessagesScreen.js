@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Octicons } from '@expo/vector-icons';
 import { Entypo } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons'; 
 import EmojiSelector from "react-native-emoji-selector";
 import { UserType } from "../UserContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -21,8 +22,9 @@ import * as ImagePicker from "expo-image-picker";
 import { EXPO_PUBLIC_URL } from '@env'
 import axios from "axios";
 import { ref, onValue, query, limitToLast, onChildAdded } from 'firebase/database';
-import { REAL_TIME_DATABASE, FIREBASE_STORAGE } from "../FirebaseConfig";
+import { REAL_TIME_DATABASE, FIREBASE_STORAGE, FIREBASE_FIRESTORE } from "../FirebaseConfig";
 import { getDownloadURL, uploadBytes, ref as storageRef } from "firebase/storage";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HoldItem } from "react-native-hold-menu";
 import MessageItem from "../components/messageItem";
@@ -31,7 +33,6 @@ import { Modalize } from 'react-native-modalize';
 
 const ChatMessagesScreen = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
-  const [selectedMessages, setSelectedMessages] = useState('');
   const [messages, setMessages] = useState([]);
   const [recepientData, setRecepientData] = useState();
   const navigation = useNavigation();
@@ -41,6 +42,7 @@ const ChatMessagesScreen = () => {
   const { userId, setUserId } = useContext(UserType);
   var [imageURL, setImageURL] = useState("");
   var [selectedReply, setSelectedReply] = useState({})
+  var [selectedPin, setSelectedPin] = useState({})
   const scrollViewRef = useRef(null);
   const modalizeRef = useRef();
   const [recepientFriendListData, setRecepientFriendListData] = useState([]);
@@ -85,6 +87,22 @@ const ChatMessagesScreen = () => {
 
   useEffect(() => {
     fetchMessages();
+    // async function fetchConversation(){
+    //   try {
+    //     const conversationDocRef = doc(FIREBASE_FIRESTORE, "conversations", conversationId);
+    //     const conversationSnapshot = await getDoc(conversationDocRef);
+    //     if (conversationSnapshot.exists()) {
+    //       const res = conversationSnapshot.data();
+    //       setSelectedPin(res?.pinMessage?.message)
+    //     } else {
+    //       console.log("Conversation does not exist");
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching conversation:", error);
+    //   }
+    // }
+
+    // fetchConversation()
   }, []);
 
   useEffect(() => {
@@ -132,10 +150,6 @@ const ChatMessagesScreen = () => {
     })
   }
 
-  useEffect(() => {
-    fetchMessages();
-  }, []);
-
   const getLastMessage = () => {
     try {
       const messagesRef = query(ref(REAL_TIME_DATABASE, `messages/${conversationId}`), limitToLast(1), "timestamp");
@@ -152,40 +166,59 @@ const ChatMessagesScreen = () => {
     navigation.setOptions({
       headerTitle: "",
       headerLeft: () => (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          <Ionicons
-            onPress={() => navigation.goBack()}
-            name="arrow-back"
-            size={24}
-            color="black"
-          />
+        <View style={{ flexDirection: "column", gap: 7}}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <Ionicons
+              onPress={() => navigation.goBack()}
+              name="arrow-back"
+              size={24}
+              color="black"
+            />
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Pressable onPress={onOpen} style={{ borderWidth: 2, borderColor: "#A6CF98", padding: 2, borderRadius: "50%", alignItems: "center" }}>
+                  <Image
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 15,
+                      resizeMode: "cover",
+                    }}
+                    source={{ uri: recepientData?.image }}
+                  />
+                </Pressable>
 
-          {selectedMessages?.length > 0 ? (
+                <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
+                  {recepientData?.name}
+                </Text>
+              </View>
+          </View>
+          {selectedPin?.message==='' ? (
             <View>
-              <Text style={{ fontSize: 16, fontWeight: "500" }}>
-                {selectedMessages?.length}
-              </Text>
+              
             </View>
           ) : (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Pressable onPress={onOpen} style={{ borderWidth: 2, borderColor: "#A6CF98", padding: 2, borderRadius: "50%", alignItems: "center" }}>
-                <Image
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
-                    resizeMode: "cover",
-                  }}
-                  source={{ uri: recepientData?.image }}
-                />
-              </Pressable>
-
-              <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
-                {recepientData?.name}
+          <View style={{ backgroundColor: '#fff', flexDirection:'row', gap: 20, justifyContent: 'start', alignItems:'center', paddingHorizontal: 10, minHeight: 55, width: 500}}>
+            <AntDesign name="message1" size={24} color="#A6CF98" />
+            <View style={{ flexDirection:'row', gap: 10, justifyContent: 'center', alignItems:'center'}}>
+              <Text style={{fontSize: 15, color: '#ADADAD'}}>
+                {selectedPin?.messageType==='text' ? 'Message' : 'Image'}:
               </Text>
+              {selectedPin?.messageType==='text' ? (
+                <Text style={{fontSize: 15 }}>
+                  {selectedPin?.message}
+                </Text>
+              ) : (
+                <Image
+                  style={{ width: 50, height: 50, borderRadius: 5 }}
+                  source={{ uri: selectedPin?.message}}
+                />
+              )}
             </View>
+            
+          </View>
           )}
         </View>
+        
       ),
       headerRight: () => (
           <Pressable>
@@ -195,32 +228,7 @@ const ChatMessagesScreen = () => {
           </Pressable>
         ) 
     });
-  }, [recepientData, selectedMessages]);
-
-  const deleteMessages = async (messageIds) => {
-    try {
-      const response = await fetch(`${EXPO_PUBLIC_URL}/user/deleteMessages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ messages: messageIds }),
-      });
-
-      if (response.status === 200) {
-        setSelectedMessages((prevSelectedMessages) =>
-        prevSelectedMessages.filter((id) => !messageIds.includes(id))
-      );
-
-        fetchMessages();
-      } else {
-        console.log("error deleting messages", response.status);
-      }
-    } catch (error) {
-      console.log("error deleting messages", error);
-    }
-  };
-  
+  }, [recepientData, selectedPin]);
 
   const pickImage = async () => {
       const timestamp = new Date()
@@ -264,11 +272,35 @@ const ChatMessagesScreen = () => {
     })
   }
 
+  async function handlePin(message) {
+    await axios.patch(`${EXPO_PUBLIC_URL}/conversation/pinMessage`, {
+      "conversationId": conversationId,
+      "message" : message,
+    })
+    setSelectedPin(message)
+    console.log('pinMessage', message)
+  }
+
+  // async function fetchConversation(){
+  //   try {
+  //     const conversationDocRef = doc(FIREBASE_FIRESTORE, "conversations", conversationId);
+  //     const conversationSnapshot = await getDoc(conversationDocRef);
+  //     if (conversationSnapshot.exists()) {
+  //       const res = conversationSnapshot.data();
+  //       setSelectedPin(res?.pinMessage?.message)
+  //     } else {
+  //       console.log("Conversation does not exist");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching conversation:", error);
+  //   }
+  // }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F0F0F0" }}>
       <ScrollView ref={scrollViewRef} contentContainerStyle={{flexGrow:1}} onContentSizeChange={handleContentSizeChange} style={styles.chatContainer}>
         {messages.map((item, index) => (
-          <MessageItem item={item} key={item.timestamp} onReply={handleReply} onDelete={handleDelete}/>
+          <MessageItem item={item} key={item.timestamp} onReply={handleReply} onDelete={handleDelete} onPin={handlePin}/>
         ))}
       </ScrollView>
 
