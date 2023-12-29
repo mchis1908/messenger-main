@@ -69,7 +69,7 @@ import Profile from "./screens/Profile";
 import * as Animatable from 'react-native-animatable';
 
 const TabArr = [
-    { route: 'Home', label: 'Home', type: Icons.Feather, icon: 'home', component: HomeScreen },
+    { route: 'Home', label: 'Community', type: Icons.Feather, icon: 'home', component: HomeScreen },
     { route: 'FriendsScreen', label: 'Friends', type: Icons.AntDesign, icon: 'adduser', component: FriendsScreen },
     { route: 'ChatsScreen', label: 'Chats', type: Icons.Ionicons, icon: 'chatbox-ellipses-outline', component: ChatsScreen },
     { route: 'AIChat', label: 'AIChat', type: Icons.MaterialCommunityIcons, icon: 'robot-excited-outline', component: AIChat },

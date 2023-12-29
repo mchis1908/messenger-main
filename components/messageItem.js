@@ -4,15 +4,17 @@ import { HoldItem } from "react-native-hold-menu";
 import { UserType } from "../UserContext";
 import { Octicons } from '@expo/vector-icons';
 import { Feather } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons'; 
 import * as Clipboard from 'expo-clipboard';
 import { MaterialIcons } from "@expo/vector-icons";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
-const MessageItem = ({ item, onReply, onDelete }) => {
+const MessageItem = ({ item, onReply, onDelete, onPin }) => {
     const { userId, setUserId } = useContext(UserType);
     const MenuItems = [
         { text: 'Reply', key: item.timestamp, icon: () => <Octicons name="reply" size={16} color="#fff" />, onPress: () => handleReplyMessage(item) },
         { text: 'Copy', key: item.timestamp, icon: () => <Feather name="copy" size={16} color="#fff" />, onPress: () => handleCopyMessage(item) },
+        { text: 'Pin', key: item.timestamp, icon: () => <AntDesign name="pushpino" size={16} color="#fff" />, onPress: () => handlePinMessage(item) },
         { text: 'Delete', key: item.timestamp, icon: () => <MaterialIcons name="delete-outline" size={20} color="red" />, isDestructive: true, onPress: () => handleDeleteMessage(item) },
     ];
     const formatTime = (time) => {
@@ -31,6 +33,10 @@ const MessageItem = ({ item, onReply, onDelete }) => {
     
     function handleDeleteMessage(item) {
         onDelete(item)
+    }
+
+    function handlePinMessage(itemSelected) {
+      onPin(itemSelected);
     }
 
     if (item.messageType === "text") {
