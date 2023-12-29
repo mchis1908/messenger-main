@@ -9,7 +9,8 @@ import AIAssistant from "./screens/AIAssistant";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
 import MainScreen from "./MainScreen";
 import DetailPost from "./screens/DetailPost";
-
+import ManageMedia from "./screens/ManageMedia";
+import ZoomedImageScreen from "./screens/ZoomedImageScreen";
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
@@ -22,6 +23,8 @@ const StackNavigator = () => {
         <Stack.Screen name="AIAssistant" component={AIAssistant} />
         <Stack.Screen name="ForgotPass" component={ForgotPass}/>
         <Stack.Screen name="DetailPost" component={DetailPost} options={{ headerShown: false }}/>
+        <Stack.Screen name="ManageMedia" component={ManageMedia}/>
+        <Stack.Screen name="ZoomedImage" component={ZoomedImageScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
