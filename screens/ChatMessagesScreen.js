@@ -36,14 +36,15 @@ const ChatMessagesScreen = () => {
   const [recepientData, setRecepientData] = useState();
   const navigation = useNavigation();
   const route = useRoute();
-  const { recepientId, conversationId } = route.params;
+  const { recepientId, conversationId, groupInfor, type } = route.params;
   var [message, setMessage] = useState("");
   const { userId, setUserId } = useContext(UserType);
   var [imageURL, setImageURL] = useState("");
   var [selectedReply, setSelectedReply] = useState({})
   const scrollViewRef = useRef(null);
   const modalizeRef = useRef();
-  const [recepientFriendListData, setRecepientFriendListData] = useState([]);
+  const defaultAvatarUrl = "https://firebasestorage.googleapis.com/v0/b/talk-time-23c0d.appspot.com/o/assets%2Fdefault-group-avatar.png?alt=media&token=2ffdbd3f-d88d-4763-aa88-0cd9608b25c2"
+  const defaultGroupName = "Group Chat"
  
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -74,6 +75,7 @@ const ChatMessagesScreen = () => {
         const data = snapshot.val();
         if (data) {
           setMessages(Object.values(data));
+          console.log("messages", messages, conversationId)
         } else {
           setMessages([]);
         }
@@ -89,17 +91,25 @@ const ChatMessagesScreen = () => {
 
   useEffect(() => {
     const fetchRecepientData = async () => {
-      try {
-        const response = await fetch(
-          `${EXPO_PUBLIC_URL}/user/${recepientId}`
-        );
-        console.log("response", response)
-        const data = await response.json();
-        setRecepientData(data);
-        console.log("recepient data", recepientId)
-        
-      } catch (error) {
-        console.log("error retrieving details", error);
+      console.log("type", type)
+      if (type === "individual") {
+        try {
+            const response = await fetch(
+              `${EXPO_PUBLIC_URL}/user/${recepientId}`
+            );
+            console.log("response", response)
+            const data = await response.json();
+            setRecepientData(data);
+            console.log("recepient data", recepientId)
+            
+          } catch (error) {
+            console.log("error retrieving details", error);
+          }
+      } else {
+        setRecepientData({
+            image: groupInfor?.groupAvatar ? groupInfor?.groupAvatar : defaultAvatarUrl,
+            name: groupInfor?.groupName ? groupInfor?.groupName : defaultGroupName,
+        })
       }
     };
 
@@ -221,6 +231,23 @@ const ChatMessagesScreen = () => {
     }
   };
   
+  function getUsernameByUserId(senderId) {
+    const targetUser = groupInfor.participants.find(user => user.id === senderId);
+    if (targetUser) {
+      return targetUser.name;
+    } else {
+      return null;
+    }
+  }
+
+  function getImageByUserId(senderId) {
+    const targetUser = groupInfor.participants.find(user => user.id === senderId);
+    if (targetUser) {
+      return targetUser.image;
+    } else {
+      return null;
+    }
+  }
 
   const pickImage = async () => {
       const timestamp = new Date()
@@ -264,12 +291,42 @@ const ChatMessagesScreen = () => {
     })
   }
 
+  function renderMessages() {
+    if (type === "individual") {
+        return (
+            messages.map((item, index) => (
+                <MessageItem item={item} key={item.timestamp} onReply={handleReply} onDelete={handleDelete}/>
+            ))
+        )
+    } else if (type === "group") {
+        return (
+            messages.map((item, index) => (
+                <View key={index}>
+                    <Text style={[item.senderId === userId ? { alignSelf: "flex-end", marginRight: 10 } : { alignSelf: "flex-start", marginLeft: 40 }, styles.groupChatSenderName]}>
+                        { getUsernameByUserId(item.senderId) }
+                    </Text>
+                    {
+                        item.senderId === userId ? (
+                            <MessageItem item={item} key={item.timestamp} onReply={handleReply} onDelete={handleDelete}/>
+                        ) : (
+                            <View style={{ flexDirection: "row" }}>
+                                <Image style={{ borderWidth: 1, width: 30, height: 30, alignSelf: "center", borderRadius: 15 }} source={{ uri: getImageByUserId(item.senderId) }}/>
+                                <MessageItem item={item} key={item.timestamp} onReply={handleReply} onDelete={handleDelete}/>
+                            </View>
+                        )
+                    }
+                </View>
+            ))
+        )
+    }
+  }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F0F0F0" }}>
-      <ScrollView ref={scrollViewRef} contentContainerStyle={{flexGrow:1}} onContentSizeChange={handleContentSizeChange} style={styles.chatContainer}>
-        {messages.map((item, index) => (
-          <MessageItem item={item} key={item.timestamp} onReply={handleReply} onDelete={handleDelete}/>
-        ))}
+      <ScrollView ref={scrollViewRef} contentContainerStyle={{flexGrow:1, paddingTop: 10}} onContentSizeChange={handleContentSizeChange} style={styles.chatContainer}>
+        {
+            renderMessages()
+        }
       </ScrollView>
 
       {
@@ -394,7 +451,9 @@ const ChatMessagesScreen = () => {
 export default ChatMessagesScreen;
 
 const styles = StyleSheet.create({
-  chatContainer: {
-
+  groupChatSenderName: {
+    fontSize: 12,
+    color: "gray",
+    marginBottom: -5
   }
 });

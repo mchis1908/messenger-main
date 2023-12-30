@@ -64,7 +64,7 @@ const MessageItem = ({ item, onReply, onDelete }) => {
                       padding: 8,
                       margin: 10,
                       borderRadius: 7,
-                      maxWidth: "60%",
+                      maxWidth: "100%",
                     },
               ]}
             >

@@ -110,7 +110,7 @@ const TabArr = [
         style={styles.container}>
         <Animatable.View
             ref={viewRef}
-            duration={1000}
+            duration={300}
             style={styles.container}
         >
             <View style={styles.btn}>
