@@ -108,7 +108,7 @@ const MessageItem = ({ item, onReply, onDelete, onPin }) => {
                       alignSelf: "flex-end",
                       backgroundColor: "#DCF8C6",
                       padding: 8,
-                      maxWidth: "60%",
+                      maxWidth: "100%",
                       borderRadius: 7,
                       margin: 10,
                     }
@@ -118,7 +118,7 @@ const MessageItem = ({ item, onReply, onDelete, onPin }) => {
                       padding: 8,
                       margin: 10,
                       borderRadius: 7,
-                      maxWidth: "60%",
+                      maxWidth: "100%",
                     },
               ]}
             >

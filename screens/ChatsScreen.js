@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Pressable, TouchableOpacity, TextInput } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { UserType } from "../UserContext";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import UserChat from "../components/UserChat";
 import { EXPO_PUBLIC_URL } from '@env'
 import axios from "axios";
@@ -20,12 +20,19 @@ const ChatsScreen = () => {
     const navigation = useNavigation();
     const modalizeRef = useRef()
     const [selectedFriend, setSelectedFriend] = useState([]);
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if (isFocused) {
+            getAllConversation()
+        }
+    }, [isFocused])
 
     useEffect(() => {
         const fetchUserId = async () => {
             const storedUserId = await AsyncStorage.getItem("userId");
-            console.log("storedUserId", storedUserId)
             setUserId(storedUserId);
+            console.log("storedUserId", storedUserId)
         };
         fetchUserId();
     }, []);
@@ -91,12 +98,7 @@ const ChatsScreen = () => {
             const response = await axios.post(`${EXPO_PUBLIC_URL}/conversation/group`, {
                 userIds: [...selectedFriend, userId]
             })
-    
-            setAcceptedFriends([{
-                id: response.data.conversationRoomInfor.id,
-                type: "group",
-                participants: response.data.conversationRoomInfor.participants_array.length,
-            }, ...acceptedFriends])
+            await getAllConversation()
             setSelectedFriend([])
             await modalizeRef.current?.close()
         } else {

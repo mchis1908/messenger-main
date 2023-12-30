@@ -89,11 +89,21 @@ const UserChat = ({ item }) => {
     ) : (
         <TouchableOpacity onPress={handleNavigateGroupChat}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10, borderWidth: 0.7, borderColor: "#D0D0D0", borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0, padding: 10 }}>
-                <Image style={{ width: 50, height: 50, borderRadius: 25, resizeMode: "cover" }} source={{ uri: defaultAvatarUrl }}/>
+                <Image style={{ width: 50, height: 50, borderRadius: 25, resizeMode: "cover" }} source={{ uri: item.groupAvatar ? item.groupAvatar : defaultAvatarUrl }}/>
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 15, fontWeight: "500" }}>{defaultGroupName}</Text>
+                    <Text style={{ fontSize: 15, fontWeight: "500" }}>{ item.groupName ? item.groupName : defaultGroupName }</Text>
                     <Text style={{ marginTop: 3, color: "gray", fontWeight: "500" }}>
-                        { item.participants.length } members
+                        {
+                            item.lastMessage.message ? (
+                                <Text style={{ marginTop: 3, color: "gray", fontWeight: "500" }}>
+                                    {userId === item.lastMessage.senderId ? "You: " : ""}{item.lastMessage.messageType === "text" ? item.lastMessage.message : "Image"}
+                                </Text>
+                            ) : (
+                                <Text style={{ marginTop: 3, color: "gray", fontWeight: "500" }}>
+                                    { item.participants.length } members
+                                </Text>
+                            )
+                        }
                     </Text>
                 </View>
             </View>
