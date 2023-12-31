@@ -67,7 +67,7 @@ const ChatMessagesScreen = () => {
 	const { userId, setUserId } = useContext(UserType);
 	var [imageURL, setImageURL] = useState("");
 	var [selectedReply, setSelectedReply] = useState({});
-	var [selectedPin, setSelectedPin] = useState({});
+	const [selectedPin, setSelectedPin] = useState({});
 	const scrollViewRef = useRef(null);
 	const modalizeRef = useRef();
     const modalChangeNameImageGroupRef = useRef();
@@ -129,29 +129,38 @@ const ChatMessagesScreen = () => {
 		}
 	};
 
-	useEffect(() => {
-		fetchMessages();
-		// async function fetchConversation(){
-		//   try {
-		//     const conversationDocRef = doc(FIREBASE_FIRESTORE, "conversations", conversationId);
-		//     const conversationSnapshot = await getDoc(conversationDocRef);
-		//     if (conversationSnapshot.exists()) {
-		//       const res = conversationSnapshot.data();
-		//       setSelectedPin(res?.pinMessage?.message)
-		//     } else {
-		//       console.log("Conversation does not exist");
-		//     }
-		//   } catch (error) {
-		//     console.error("Error fetching conversation:", error);
-		//   }
-		// }
+	const fetchConversation = async () =>{
+		try {
+			const conversationDocRef = doc(FIREBASE_FIRESTORE, "conversations", conversationId);
+			const conversationSnapshot = await getDoc(conversationDocRef);
+			if (conversationSnapshot.exists()) {
+				const res = conversationSnapshot.data();
+				setSelectedPin(res?.pinMessage)
+			} else {
+				setSelectedPin({})
+				console.log("Conversation does not exist");
+			}
+		} catch (error) {
+		console.error("Error fetching conversation:", error);
+		}
+	};
 
-		// fetchConversation()
+	useEffect(() => {
+		const fetchData = async () => {
+		  try {
+			await fetchConversation();
+			fetchMessages();
+		  } catch (error) {
+			console.error("Error during initial data fetching:", error);
+		  }
+		};
+	  
+		fetchData();
 	}, []);
+	
 
 	useEffect(() => {
 		const fetchRecepientData = async () => {
-			console.log("type", type);
 			if (type === "individual") {
 				try {
 					const response = await fetch(
@@ -160,7 +169,6 @@ const ChatMessagesScreen = () => {
 					console.log("response", response);
 					const data = await response.json();
 					setRecepientData(data);
-					console.log("recepient data", recepientId);
 				} catch (error) {
 					console.log("error retrieving details", error);
 				}
@@ -234,113 +242,58 @@ const ChatMessagesScreen = () => {
 		navigation.setOptions({
 			headerTitle: "",
 			headerLeft: () => (
-				<View style={{ flexDirection: "column", gap: 7 }}>
+				<View
+					style={{
+						flexDirection: "row",
+						alignItems: "center",
+						gap: 10,
+					}}
+				>
+					<Ionicons
+						onPress={() => navigation.navigate("MainScreen", {
+							reload: true
+						})}
+						name="arrow-back"
+						size={24}
+						color="black"
+					/>
 					<View
 						style={{
 							flexDirection: "row",
 							alignItems: "center",
-							gap: 10,
 						}}
 					>
-						<Ionicons
-							onPress={() => navigation.navigate("MainScreen", {
-                                reload: true
-                            })}
-							name="arrow-back"
-							size={24}
-							color="black"
-						/>
-						<View
+						<Pressable
+							onPress={onOpen}
 							style={{
-								flexDirection: "row",
+								borderWidth: 2,
+								borderColor: "#A6CF98",
+								padding: 2,
+								borderRadius: "50%",
 								alignItems: "center",
 							}}
 						>
-							<Pressable
-								onPress={onOpen}
+							<Image
 								style={{
-									borderWidth: 2,
-									borderColor: "#A6CF98",
-									padding: 2,
-									borderRadius: "50%",
-									alignItems: "center",
+									width: 30,
+									height: 30,
+									borderRadius: 15,
+									resizeMode: "cover",
 								}}
-							>
-								<Image
-									style={{
-										width: 30,
-										height: 30,
-										borderRadius: 15,
-										resizeMode: "cover",
-									}}
-									source={{ uri: recepientData?.image }}
-								/>
-							</Pressable>
-
-							<Text
-								style={{
-									marginLeft: 5,
-									fontSize: 15,
-									fontWeight: "bold",
-								}}
-							>
-								{recepientData?.name}
-							</Text>
-						</View>
-					</View>
-					{selectedPin?.message === "" ? (
-						<View></View>
-					) : (
-						<View
-							style={{
-								backgroundColor: "#fff",
-								flexDirection: "row",
-								gap: 20,
-								justifyContent: "start",
-								alignItems: "center",
-								paddingHorizontal: 10,
-								minHeight: 55,
-								width: "100%",
-							}}
-						>
-							<AntDesign
-								name="message1"
-								size={24}
-								color="#A6CF98"
+								source={{ uri: recepientData?.image }}
 							/>
-							<View
-								style={{
-									flexDirection: "row",
-									gap: 10,
-									justifyContent: "center",
-									alignItems: "center",
-								}}
-							>
-								<Text
-									style={{ fontSize: 15, color: "#ADADAD" }}
-								>
-									{selectedPin?.messageType === "text"
-										? "Message"
-										: "Image"}
-									:
-								</Text>
-								{selectedPin?.messageType === "text" ? (
-									<Text style={{ fontSize: 15 }}>
-										{selectedPin?.message}
-									</Text>
-								) : (
-									<Image
-										style={{
-											width: 50,
-											height: 50,
-											borderRadius: 5,
-										}}
-										source={{ uri: selectedPin?.message }}
-									/>
-								)}
-							</View>
-						</View>
-					)}
+						</Pressable>
+
+						<Text
+							style={{
+								marginLeft: 5,
+								fontSize: 15,
+								fontWeight: "bold",
+							}}
+						>
+							{recepientData?.name}
+						</Text>
+					</View>
 				</View>
 			),
 			headerRight: () => (
@@ -357,7 +310,7 @@ const ChatMessagesScreen = () => {
 				</Pressable>
 			),
 		});
-	}, [recepientData, selectedPin]);
+	}, [recepientData]);
 
 	function getUsernameByUserId(senderId) {
 		const targetUser = groupInfor.participants.find(
@@ -456,7 +409,13 @@ const ChatMessagesScreen = () => {
 			message: message,
 		});
 		setSelectedPin(message);
-		console.log("pinMessage", message);
+	}
+
+	const handleGotoPin = async (timestamp) => {
+		// this.scrollViewRef.scrollTo({
+		// 	y: this.fieldThreelayout.y,
+		// 	animated: true
+		// });
 	}
 
 	function renderMessages() {
@@ -467,6 +426,7 @@ const ChatMessagesScreen = () => {
 					key={item.timestamp}
 					onReply={handleReply}
 					onDelete={handleDelete}
+					onPin={handlePin}
 				/>
 			));
 		} else if (type === "group") {
@@ -488,6 +448,7 @@ const ChatMessagesScreen = () => {
 							key={item.timestamp}
 							onReply={handleReply}
 							onDelete={handleDelete}
+							onPin={handlePin}
 						/>
 					) : (
 						<View style={{ flexDirection: "row" }}>
@@ -508,6 +469,7 @@ const ChatMessagesScreen = () => {
 								key={item.timestamp}
 								onReply={handleReply}
 								onDelete={handleDelete}
+								onPin={handlePin}
 							/>
 						</View>
 					)}
@@ -561,6 +523,30 @@ const ChatMessagesScreen = () => {
 
 	return (
 		<KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F0F0F0" }}>
+			{
+				selectedPin?.message ? (
+                <View onPress={handleGotoPin(selectedPin.timestamp)}
+					style={{ backgroundColor: "#fff", flexDirection: "row", gap: 20, justifyContent: "start", alignItems: "center", paddingHorizontal: 10, minHeight: 55, width: "100%"}}
+				>
+					<AntDesign name="message1" size={24} color="#A6CF98"/>
+					<View style={{ flexDirection: "row", gap: 10, justifyContent: "center", alignItems: "center"}}>
+						<Text style={{ fontSize: 15, color: "#ADADAD" }}>
+							{selectedPin.messageType === "text" ? "Message" : "Image"} :
+						</Text>
+						{selectedPin.messageType === "text" ? (
+							<Text style={{ fontSize: 15 }}>
+								{selectedPin.message}
+							</Text>
+						) : (
+							<Image style={{ width: 50, height: 50, borderRadius: 5,}} source={{ uri: selectedPin.message }}/>
+						)}
+					</View>
+				</View>
+                ) : (
+                	<View></View>
+                )
+            }
+
 			<ScrollView
 				ref={scrollViewRef}
 				contentContainerStyle={{ flexGrow: 1, paddingTop: 10 }}
