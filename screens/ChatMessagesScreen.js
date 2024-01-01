@@ -16,12 +16,9 @@ import React, {
 	useEffect,
 	useRef,
 } from "react";
-import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
 import { UserType } from "../UserContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -75,6 +72,9 @@ const ChatMessagesScreen = () => {
 		"https://firebasestorage.googleapis.com/v0/b/talk-time-23c0d.appspot.com/o/assets%2Fdefault-group-avatar.png?alt=media&token=2ffdbd3f-d88d-4763-aa88-0cd9608b25c2";
 	const defaultGroupName = "Group Chat";
     const [nameGroup, setNameGroup] = useState("");
+    const [isOpenSticker, setIsOpenSticker] = useState(false);
+    const [stickerPack, setStickerPack] = useState([]);
+    const [searchStickerQuery, setSearchStickerQuery] = useState("");
 
 	const scrollToBottom = () => {
 		setTimeout(() => {
@@ -219,6 +219,27 @@ const ChatMessagesScreen = () => {
 			setSelectedReply({});
         })
 	};
+
+    function handleSendSticker(stickerUrl) {
+        console.log("stickerUrl", stickerUrl)
+        const timestamp = new Date();
+        const payload = {
+            conversationId: conversationId,
+            senderId: userId,
+            messageType: "sticker",
+            message: stickerUrl,
+            timestamp: timestamp.getTime(),
+        }
+        fetch(`${EXPO_PUBLIC_URL}/message`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        }).then(() => {
+            getLastMessage();
+        })
+    }
 
 	const getLastMessage = () => {
 		try {
@@ -538,6 +559,28 @@ const ChatMessagesScreen = () => {
         }
       };
 
+      async function openSticker() {
+        const responseSticker = await fetch("https://api.giphy.com/v1/stickers/trending?api_key=0OhI97Zbr3nJzojt0tN53RhV6EdDcEJ6&limit=9&offset=0&rating=g&bundle=messaging_non_clips")
+        if (responseSticker.ok) {
+            const data = await responseSticker.json();
+            setStickerPack(data.data)
+            console.log("responseSticker", data)
+        }
+        setIsOpenSticker(!isOpenSticker);
+      }
+
+      function handleSearchSticker(searchQuery) {
+        setSearchStickerQuery(searchQuery);
+        fetch(`https://api.giphy.com/v1/stickers/search?api_key=0OhI97Zbr3nJzojt0tN53RhV6EdDcEJ6&q=${searchQuery}&limit=9&offset=0&rating=g&lang=en&bundle=messaging_non_clips`)
+        .then((response) => response.json())
+        .then((data) => {
+            setStickerPack(data.data)
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+      }
+
 	return (
 		<KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#F0F0F0" }}>
 			{
@@ -668,9 +711,10 @@ const ChatMessagesScreen = () => {
 						flex: 1,
 						height: 40,
 						borderWidth: 1,
-						borderColor: "#dddddd",
+						borderColor: "#000",
 						borderRadius: 20,
 						paddingHorizontal: 10,
+                        color: "#000"
 					}}
 					placeholder="Type Your message..."
 				/>
@@ -683,14 +727,10 @@ const ChatMessagesScreen = () => {
 						marginHorizontal: 8,
 					}}
 				>
-					<Ionicons
-						onPress={pickImage}
-						name="camera"
-						size={24}
-						color="gray"
-					/>
 
-					<FontAwesome name="microphone" size={24} color="gray" />
+                    <MaterialCommunityIcons onPress={openSticker} name="sticker-emoji" size={22} color="black" />
+                    <MaterialCommunityIcons onPress={pickImage} name="camera-outline" size={24} color="black" />
+
 				</View>
 
 				{message && (
@@ -706,6 +746,7 @@ const ChatMessagesScreen = () => {
 						<Ionicons name="md-send" size={16} color="#fff" />
 					</Pressable>
 				)}
+                
 				<Modalize ref={modalizeRef} modalTopOffset={100}>
 					<View style={{ width: "100%", alignItems: "center", marginTop: 20, flexDirection: "column", gap: 10 }}>
 						<Pressable style={{ borderWidth: 3, borderColor: "#739072", padding: 5, borderRadius: 60, alignItems: "center", width: 120, height: 120, justifyContent: "center" }}>
@@ -779,6 +820,25 @@ const ChatMessagesScreen = () => {
 					style={{ height: 250 }}
 				/>
 			)}
+
+            {
+                isOpenSticker && (
+                    <View style={{ height: 300, flexDirection: "column", justifyContent: "flex-start", alignItems: "center", paddingHorizontal: 20, marginTop: -20 }}>
+                        <TextInput onChangeText={(text) => handleSearchSticker(text)} style={{ width: "100%", height: 40, borderWidth: 1, borderColor: "#ddd", borderRadius: 10, paddingHorizontal: 10, marginBottom: 20 }} placeholder="Search sticker"/>
+                        <ScrollView style={{ width: "100%" }}>
+                            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 50 }}>
+                                {
+                                    stickerPack.map((item, index) => (
+                                        <TouchableOpacity onPress={() => handleSendSticker(item.images.original.url)} key={index} style={{ width: 100, height: 100, borderRadius: 10 }}>
+                                            <Image source={{ uri: item.images.original.url }} style={{ width: "100%", height: "100%" }}/>
+                                        </TouchableOpacity>
+                                    ))
+                                }
+                            </View>
+                        </ScrollView>
+                    </View>
+                )
+            }
 		</KeyboardAvoidingView>
 	);
 };
