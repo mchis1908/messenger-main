@@ -2,8 +2,6 @@ import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
 import { UserType } from "../UserContext";
 import { EXPO_PUBLIC_URL } from '@env'
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const User = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -57,19 +55,15 @@ const User = ({ item }) => {
   }, [userId]);
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     try {
-      // const response = await fetch(`${EXPO_PUBLIC_URL}/user/friend-request`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ currentUserId, selectedUserId }),
-      // });
-      const response = await axios.post(`${EXPO_PUBLIC_URL}/user/friend-request`, {
-        "currentUserId": currentUserId,
-        "selectedUserId": selectedUserId
+      const response = fetch(`${EXPO_PUBLIC_URL}/user/friend-request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ currentUserId, selectedUserId }),
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         setRequestSent(true);
       }
     } catch (error) {

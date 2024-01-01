@@ -27,7 +27,6 @@ import { UserType } from "../UserContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { EXPO_PUBLIC_URL } from "@env";
-import axios from "axios";
 import {
 	ref,
 	onValue,
@@ -187,7 +186,7 @@ const ChatMessagesScreen = () => {
 		fetchRecepientData();
 	}, []);
 
-	const handleSendMessage = (messageType) => {
+	const handleSendMessage = async (messageType) => {
 		const timestamp = new Date();
 
 		let payload =
@@ -208,12 +207,17 @@ const ChatMessagesScreen = () => {
 						message: messageType === "text" ? message : imageURL,
 						timestamp: timestamp.getTime(),
 				  };
-
-		axios.post(`${EXPO_PUBLIC_URL}/message`, payload).then(() => {
-			setMessage("");
+        await fetch(`${EXPO_PUBLIC_URL}/message`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        }).then(() => {
+            setMessage("");
 			getLastMessage();
 			setSelectedReply({});
-		});
+        })
 	};
 
 	const getLastMessage = () => {
@@ -397,17 +401,30 @@ const ChatMessagesScreen = () => {
 	}
 
 	async function handleDelete(message) {
-		axios.post(`${EXPO_PUBLIC_URL}/message/delete`, {
-			conversationId: conversationId,
-			timestamp: message.timestamp,
-		});
+        fetch(`${EXPO_PUBLIC_URL}/message/delete`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                conversationId: conversationId,
+                timestamp: message.timestamp,
+            })
+        })
 	}
 
 	async function handlePin(message) {
-		await axios.patch(`${EXPO_PUBLIC_URL}/conversation/pinMessage`, {
-			conversationId: conversationId,
-			message: message,
-		});
+        fetch(`${EXPO_PUBLIC_URL}/conversation/pinMessage`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                conversationId: conversationId,
+			    message: message,
+            })
+        })
+
 		setSelectedPin(message);
 	}
 

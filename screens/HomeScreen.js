@@ -5,7 +5,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import SocialPost from "../components/socialPost";
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { Modalize } from "react-native-modalize";
-import axios from "axios";
 import { EXPO_PUBLIC_URL } from '@env';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
@@ -27,9 +26,11 @@ const HomeScreen = () => {
     const fetchUserData = async () => {
       try {
         const storedUserId = await AsyncStorage.getItem("userId");
-        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
-        setUserData(response.data);
-        console.log("userData", userData)
+        const response = await fetch(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
+        if (response.ok) {
+            const data = await response.json();
+            setUserData(data);
+        }
       } catch (error) {
         console.log("Error:", error);
       }

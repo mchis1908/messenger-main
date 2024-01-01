@@ -6,7 +6,6 @@ import { timeAgo } from '../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { REAL_TIME_DATABASE } from "../FirebaseConfig";
 import { ref as RealtimeRef, onValue, runTransaction } from "firebase/database";
-import axios from 'axios';
 import { EXPO_PUBLIC_URL } from '@env';
 import { TextInput } from 'react-native-gesture-handler';
 import CommentItem from '../components/commentItem';
@@ -27,9 +26,11 @@ export default function DetailPost() {
           try {
             const storedUserId = await AsyncStorage.getItem("userId");
             console.log("storedUserId", storedUserId)
-            const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
-            console.log("response", response)
-            setUserData(response.data);
+            const response = await fetch(`${EXPO_PUBLIC_URL}/user/${storedUserId}`)
+            if (response.ok) {
+                const data = await response.json();
+                setUserData(data);
+            }
             console.log("userData in details post", userData)
           } catch (error) {
             console.log("Error:", error);
