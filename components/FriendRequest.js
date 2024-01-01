@@ -3,8 +3,6 @@ import React, { useContext, useEffect } from "react";
 import { UserType } from "../UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { EXPO_PUBLIC_URL } from '@env'
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const { userId, setUserId } = useContext(UserType);
@@ -12,21 +10,32 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
 
   const acceptRequest = async (friendRequestId) => {
     try {
-      const response = await axios.post(`${EXPO_PUBLIC_URL}/user/friend-request/accept`, {
-        "senderId": friendRequestId,
-        "recipientId": userId
-      });
+      const response = await fetch(`${EXPO_PUBLIC_URL}/user/friend-request/accept`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "senderId": friendRequestId,
+          "recipientId": userId
+        }),
+      })
+      console.log("response", response)
 
-      if (response.status===200) {
+      if (response.ok) {
         setFriendRequests(
           friendRequests.filter((request) => request.id !== friendRequestId)
         );
 
-        await axios.post(`${EXPO_PUBLIC_URL}/conversation`, {
-          "user1Id": userId,
-          "user2Id": friendRequestId
-        }).then((response) => {
-          navigation.navigate("Chats");
+        await fetch(`${EXPO_PUBLIC_URL}/conversation`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "user1Id": userId,
+                "user2Id": friendRequestId
+            }),
         })
       }
     } catch (err) {

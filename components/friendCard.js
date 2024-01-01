@@ -1,6 +1,5 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
 import { EXPO_PUBLIC_URL } from '@env';
 
 export default function FriendCard({ friendId }) {
@@ -9,10 +8,12 @@ export default function FriendCard({ friendId }) {
     useEffect(() => {
         async function fetchFriendData() {
             try {
-                const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${friendId}`);
-                console.log("response", response)
-                setFriendData(response.data);
-                console.log("userData", friendData)
+                const response = await fetch(`${EXPO_PUBLIC_URL}/user/${friendId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("friendData", data)
+                    setFriendData(data);
+                }
             } catch (error) {
                 console.log("Error:", error);
             }

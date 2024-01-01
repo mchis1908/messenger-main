@@ -53,11 +53,16 @@ const ChatsScreen = () => {
         };
 
         const getAllConversation = async () => {
-            const response = await axios.get(`${EXPO_PUBLIC_URL}/conversation/${userId}`);
-            console.log("response", response)
-            setAcceptedFriends(response.data.conversations);
-            setOriginalAcceptedFriends(response.data.conversations);
-            console.log("conversations", acceptedFriends)
+            const storedUserId = await AsyncStorage.getItem("userId");
+            const response = await fetch(`${EXPO_PUBLIC_URL}/conversation/${storedUserId}`);
+    
+            if (response.ok) {
+                const data = await response.json();
+                setAcceptedFriends(data.conversations);
+                setOriginalAcceptedFriends(data.conversations);
+            } else {
+                console.error("Error fetching data:", response.statusText);
+            }
         }
     useEffect(() => {
         if (userId) {

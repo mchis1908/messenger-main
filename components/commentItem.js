@@ -1,6 +1,5 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
 import { EXPO_PUBLIC_URL } from '@env';
 import { timeAgo } from '../constants';
 
@@ -9,10 +8,12 @@ export default function CommentItem({ commentData }) {
     useEffect(() => {
         const fetchAuthorData = async () => {
           try {
-            const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${commentData.commentAuthorId}`);
-            console.log("response", response)
-            setAuthorData(response.data);
-            console.log("userData", authorData)
+            const response = await fetch(`${EXPO_PUBLIC_URL}/user/${commentData.commentAuthorId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setAuthorData(data);
+                console.log("userData", authorData)
+            }
           } catch (error) {
             console.log("Error:", error);
           }

@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Pressable, TextInput } from "react-native";
-import React, { useEffect, useContext, useState } from "react";
+import { StyleSheet, Text, View, Pressable, TextInput, Image, TouchableOpacity } from "react-native";
+import React, { useEffect, useContext, useState, useRef } from "react";
 import axios from "axios";
 import { UserType } from "../UserContext";
 import FriendRequest from "../components/FriendRequest";
@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import User from "../components/User";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import { Modalize } from "react-native-modalize";
 
 const FriendsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
@@ -19,6 +20,7 @@ const FriendsScreen = () => {
   const [friendData, setFriendData] = useState(null);
   const [friendId, setFriendId] = useState(null);
   const [hasPermission, setHasPermission] = useState(null);
+  const modalizeRef = useRef()
 
   useEffect(() => {
     (async () => {
@@ -65,29 +67,17 @@ const FriendsScreen = () => {
     }
   }
 
-  const handleBarCodeScanned = ({ type, data }) => {
-    console.log("aaaaaa", data.id)
-    setFriendId(data);
-    setOpenQrCodeScanner(false);
-    console.log("friendData", friendId)
-  }
+  const handleBarCodeScanned = async ({ type, data }) => {
+    console.log("aaaaaa", data)
 
-  useEffect(() => {
-    const fetchFriendData = async () => {
-      try {
-        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${friendId}`);
-        if (response.status === 200) {
-          setFriendData(response.data);
-          console.log("friendData", friendData)
-        }
-      } catch (error) {
-        console.log("Error:", error);
-      }
-    };
-    if (friendId) {
-      fetchFriendData();
+    const response = await fetch(`${EXPO_PUBLIC_URL}/user/${data}`);
+    if (response.ok) {
+        const data = await response.json();
+        setFriendData(data);
+        modalizeRef.current?.open();
     }
-  }, [friendId])
+    setOpenQrCodeScanner(false);
+  }
 
   function activateScanner() {
     setOpenQrCodeScanner(true)
@@ -135,13 +125,7 @@ const FriendsScreen = () => {
         ))}
       </View>
 
-      {
-        openQrCodeScanner && (
-          <BarCodeScanner
-          onBarCodeScanned={handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}/>
-        )
-      }
+      
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Text style={{fontSize:30,fontWeight:'bold',padding:20, alignSelf: "flex-start"}}>Friend Requests</Text>
       </View>
@@ -163,10 +147,58 @@ const FriendsScreen = () => {
           )
         }
       </View>
+
+      {
+        friendData && (
+          <Modalize ref={modalizeRef} modalTopOffset={400}>
+            <View style={{ paddingHorizontal: 20 }}>
+              <Text style={{ fontSize: 20, fontWeight: "bold", width: "100%", paddingVertical: 20 }}>Add friend</Text>
+              <View style={{ flexDirection: "row", gap: 20 }}>
+                <Image style={styles.friendAvatar} source={{ uri: friendData.image }}/>
+                <View style={styles.friendBody}>
+                  <Text style={{ fontSize: 20, fontWeight: "bold", color: "black" }}>{ friendData.name }</Text>
+                  <Text style={{ fontSize: 15, fontWeight: "500", color: "gray" }}>{ friendData.email }</Text>
+                </View>
+              </View>
+              <TouchableOpacity style={{backgroundColor: "#092635", borderRadius: 16, marginTop: 20}} onPress={() => handleAddFriend()}>
+                <Text style={{ fontSize: 16, fontWeight: "bold", width: "100%", paddingVertical: 10, textAlign: "center", color: "white" }}>Add Friend</Text>
+              </TouchableOpacity>
+            </View>
+          </Modalize>
+        )
+      }
+      {
+        openQrCodeScanner && (
+          <BarCodeScanner
+          onBarCodeScanned={handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}/>
+        )
+      }
     </SafeAreaView>
   );
 };
 
 export default FriendsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    friendCard: {
+        width: "80%",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        gap: 10,
+        marginBottom: 20,
+    }, friendAvatar: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 2,
+        borderColor: "#43766C",
+    }, friendBody: {
+        width: "80%",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        gap: 5,
+    }
+});
