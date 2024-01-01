@@ -1,19 +1,16 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import { View, Text, Pressable, Alert, Image, TextInput, TouchableOpacity } from 'react-native'; // Import thêm Image
+import { View, Text, Pressable, Image, TextInput, TouchableOpacity } from 'react-native'; 
 import { useNavigation } from '@react-navigation/core';
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EXPO_PUBLIC_URL } from '@env';
-import axios from "axios";
-import { Avatar } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_FIRESTORE } from '../FirebaseConfig';
-import * as FileSystem from 'expo-file-system';
 import { doc, updateDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons, Feather, MaterialCommunityIcons, Octicons } from '@expo/vector-icons'; 
+import { Ionicons, Feather, Octicons } from '@expo/vector-icons'; 
 import QRCodeModal from '../components/qrCodeModal';
 import { Modalize } from 'react-native-modalize';
 import { updatePassword } from 'firebase/auth';
@@ -36,11 +33,12 @@ const Profile = () => {
         console.log("storedUserId", storedUserId)
         setUserId(storedUserId);
 
-        const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${userId}`);
-        console.log("response", response)
-        setUsers(response.data);
-        console.log("userData", users)
-        setEditInformation(response.data.name);
+        const response = await fetch(`${EXPO_PUBLIC_URL}/user/${userId}`)
+        if (response.ok) {
+            const data = await response.json();
+            setUsers(data);
+            setEditInformation(data.name);
+        }
       } catch (error) {
         console.log("Error:", error);
       }

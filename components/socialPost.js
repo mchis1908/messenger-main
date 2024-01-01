@@ -4,7 +4,6 @@ import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ref as RealtimeRef, push, onValue, set, query, equalTo, runTransaction } from "firebase/database";
 import { REAL_TIME_DATABASE } from "../FirebaseConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import { EXPO_PUBLIC_URL } from '@env';
 import { useNavigation } from '@react-navigation/native';
 import { timeAgo } from '../constants';
@@ -20,10 +19,11 @@ const SocialPost = ({ postData }) => {
           try {
             const storedUserId = await AsyncStorage.getItem("userId");
             console.log("storedUserId", storedUserId)
-            const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
-            console.log("response", response)
-            setUserData(response.data);
-            console.log("userData", userData)
+            const response = await fetch(`${EXPO_PUBLIC_URL}/user/${storedUserId}`)
+            if (response.ok) {
+                const data = await response.json();
+                setUserData(data);
+            }
           } catch (error) {
             console.log("Error:", error);
           }

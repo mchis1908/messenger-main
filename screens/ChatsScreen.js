@@ -4,7 +4,6 @@ import { UserType } from "../UserContext";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import UserChat from "../components/UserChat";
 import { EXPO_PUBLIC_URL } from '@env'
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from '@expo/vector-icons';
@@ -43,21 +42,28 @@ const ChatsScreen = () => {
             console.log("storedUserId", storedUserId)
             setUserId(storedUserId);
     
-            const response = await axios.get(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
-            console.log("response", response)
-            setUser(response.data);
-            console.log("userData friends", user.friends)
+            const response = await fetch(`${EXPO_PUBLIC_URL}/user/${storedUserId}`);
+            if (response.ok) {
+              const data = await response.json();
+              setUser(data);
+              console.log("userData", data)
+            }
           } catch (error) {
             console.log("Error:", error);
           }
         };
 
         const getAllConversation = async () => {
-            const response = await axios.get(`${EXPO_PUBLIC_URL}/conversation/${userId}`);
-            console.log("response", response)
-            setAcceptedFriends(response.data.conversations);
-            setOriginalAcceptedFriends(response.data.conversations);
-            console.log("conversations", acceptedFriends)
+            const storedUserId = await AsyncStorage.getItem("userId");
+            const response = await fetch(`${EXPO_PUBLIC_URL}/conversation/${storedUserId}`);
+    
+            if (response.ok) {
+                const data = await response.json();
+                setAcceptedFriends(data.conversations);
+                setOriginalAcceptedFriends(data.conversations);
+            } else {
+                console.error("Error fetching data:", response.statusText);
+            }
         }
     useEffect(() => {
         if (userId) {
@@ -95,12 +101,18 @@ const ChatsScreen = () => {
 
     async function handleCreateGroupChat() {
         if (selectedFriend.length > 1) {
-            const response = await axios.post(`${EXPO_PUBLIC_URL}/conversation/group`, {
-                userIds: [...selectedFriend, userId]
+            await fetch(`${EXPO_PUBLIC_URL}/conversation/group`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ userIds: [...selectedFriend, userId] }),
+            }).then(async () => {
+                await getAllConversation()
+                setSelectedFriend([])
+                await modalizeRef.current?.close()
             })
-            await getAllConversation()
-            setSelectedFriend([])
-            await modalizeRef.current?.close()
+            
         } else {
             alert("Please select at least two friend to create group chat!")
         }
@@ -115,7 +127,7 @@ const ChatsScreen = () => {
                         <AntDesign name="addusergroup" size={24} color="black" />
                     </TouchableOpacity>
                 </View>
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ height: "80%" }}>
                     <Pressable>
                         {
                             acceptedFriends.length > 0 ? (

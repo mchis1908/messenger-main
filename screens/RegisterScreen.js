@@ -5,12 +5,10 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Pressable,
-  Alert,
   Image,
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
 import logo from "../assets/logo.png";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import {
@@ -53,20 +51,25 @@ const RegisterScreen = () => {
         auth,
         email,
         password
-      ).then((userCredential) => {
+      ).then(async (userCredential) => {
         const user = userCredential.user;
-        axios.post(`${EXPO_PUBLIC_URL}/user`, {
-          name: name,
-          email: email,
-          password: password,
-          image: null,
-          friendRequests: [],
-          friends: [],
-          sentFriendRequests: [],
-          id: user.uid,
-        });
+        await fetch(`${EXPO_PUBLIC_URL}/user`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                password: password,
+                image: "https://firebasestorage.googleapis.com/v0/b/talk-time-23c0d.appspot.com/o/assets%2Fdefault-avatar.png?alt=media&token=c026f928-3de9-4bb5-9b04-af42bcc595e2",
+                friendRequests: [],
+                friends: [],
+                sentFriendRequests: [],
+                id: user.uid,
+            }),
+        })
       });
-      // Send email verification
       sendEmailVerification(auth.currentUser).then(() => {
         setAlertMessage("Registration successful. Email verification link sent.");
         setShowAlert(true);

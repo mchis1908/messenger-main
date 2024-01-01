@@ -1,7 +1,5 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
-import { EXPO_PUBLIC_URL } from '@env';
 
 export default function GroupMemberItem({ memberInfo }) {
     return (

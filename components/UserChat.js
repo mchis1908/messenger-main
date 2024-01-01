@@ -2,9 +2,6 @@ import { StyleSheet, Text, View, Pressable, Image, TouchableOpacity } from "reac
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { UserType } from "../UserContext";
-import { EXPO_PUBLIC_URL } from '@env'
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserChat = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);
